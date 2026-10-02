@@ -126,11 +126,15 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // 1. BCC ironCard
-        const ironBenefit = state.price * 0.04;
+        // Месячная ставка
+        const monthlyRate = (state.depositRate / 100) / 12;
+
+        // 1. BCC ironCard (Кешбэк + процент на кешбэк за время рассрочки)
+        let ironCashback = state.price * 0.04;
+        let ironBenefit = ironCashback * Math.pow(1 + monthlyRate, state.installmentMonths);
 
         // 2. Kaspi Gold
-        const goldBenefit = state.kaspiGoldBonusAmount;
+        let goldBenefit = state.kaspiGoldBonusAmount * Math.pow(1 + monthlyRate, state.installmentMonths);
 
         // 3. BCC #картакарта (кешбэк + грейс 85 дней)
         let kartaBenefit = 0;
@@ -148,7 +152,14 @@ document.addEventListener('DOMContentLoaded', () => {
             kartaCashback = state.price * (state.customCashbackRate / 100);
             if (kartaCashback > 20000) kartaCashback = 20000;
             graceInterest = state.price * (state.depositRate / 100 / 365) * 85;
-            kartaBenefit = kartaCashback + graceInterest;
+            
+            let baseKarta = kartaCashback + graceInterest;
+            let remainingMonths = state.installmentMonths - (85 / 30.416);
+            if (remainingMonths > 0) {
+                kartaBenefit = baseKarta * Math.pow(1 + monthlyRate, remainingMonths);
+            } else {
+                kartaBenefit = baseKarta;
+            }
 
             valKarta.textContent = formatMoney(kartaBenefit);
             descKarta.textContent = kartaCashback >= 20000 ? `Лимит 20к + ${formatMoney(graceInterest)} грейс` : `Кешбэк + ${formatMoney(graceInterest)} грейс`;
@@ -160,7 +171,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let balance = state.price;
         let instInterest = 0;
         const monthlyPayment = state.price / state.installmentMonths;
-        const monthlyRate = (state.depositRate / 100) / 12;
 
         let interestHistory = [];
         for (let m = 1; m <= state.installmentMonths; m++) {
@@ -211,13 +221,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // Формируем детальное объяснение
             let explanation = '';
             if (item.id === 'res-karta') {
-                explanation = `Включает ${formatMoney(kartaCashback)} кешбэка и ${formatMoney(graceInterest)} дохода по депозиту за 85 дней беспроцентного периода.`;
+                explanation = `Включает ${formatMoney(kartaCashback)} кешбэка и ${formatMoney(graceInterest)} за 85 дней грейса, которые затем продолжат приносить процент на депозите.`;
             } else if (item.id === 'res-inst') {
                 explanation = `Вы заработаете ${formatMoney(instInterest)} процентов на депозите за ${state.installmentMonths} мес.` + (state.installmentBonus > 0 ? ` + ${formatMoney(state.installmentBonus)} по акции.` : '');
             } else if (item.id === 'res-gold') {
-                explanation = `Вы получите ${formatMoney(goldBenefit)} в виде Kaspi бонусов.`;
+                explanation = `Вы получите ${formatMoney(state.kaspiGoldBonusAmount)} Kaspi бонусов сразу, и они (как эквивалент денег) принесут процент на депозите за ${state.installmentMonths} мес.`;
             } else if (item.id === 'res-iron') {
-                explanation = `Вы получите 4% кешбэка деньгами от стоимости товара.`;
+                explanation = `Вы получите ${formatMoney(ironCashback)} кешбэка деньгами сразу, и они принесут сложный процент на депозите за ${state.installmentMonths} мес.`;
             }
 
             // Создаем или находим кастомный тултип
