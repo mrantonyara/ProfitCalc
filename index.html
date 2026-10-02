@@ -15,89 +15,30 @@
         </header>
 
         <main class="content">
-            <!-- Секция: Стоимость товара -->
+            <!-- Ввод данных -->
             <section class="card">
-                <label for="item-price" class="input-label">Стоимость товара (₸)</label>
+                <label for="item-price" class="input-label">Стоимость товара на Kaspi (₸)</label>
                 <input type="text" id="item-price" class="input-field formatted-input price-input" placeholder="0" inputmode="numeric">
-            </section>
-
-            <!-- Секция: Оплата картой -->
-            <section class="card">
-                <h2>Если купить сразу</h2>
                 
-                <div class="list-group">
-                    <label class="list-item">
-                        <input type="radio" name="card-type" value="bcc-iron" checked>
-                        <img src="ironcard.png" alt="IronCard" class="card-img">
-                        <div class="list-content">
-                            <span class="list-title">BCC ironCard</span>
-                            <span class="list-desc">Кешбэк 4%</span>
-                        </div>
-                        <div class="radio-indicator"></div>
-                    </label>
-                    
-                    <label class="list-item">
-                        <input type="radio" name="card-type" value="bcc-karta">
-                        <img src="kartakarta.png" alt="#картакарта" class="card-img">
-                        <div class="list-content">
-                            <span class="list-title">BCC #картакарта</span>
-                            <span class="list-desc">Лимит 20 000 ₸</span>
-                        </div>
-                        <div class="radio-indicator"></div>
-                    </label>
-                    
-                    <label class="list-item">
-                        <input type="radio" name="card-type" value="kaspi-gold">
-                        <img src="kaspigold.png" alt="Kaspi Gold" class="card-img">
-                        <div class="list-content">
-                            <span class="list-title">Kaspi Gold</span>
-                            <span class="list-desc">Укажу сумму бонусов</span>
-                        </div>
-                        <div class="radio-indicator"></div>
-                    </label>
+                <div class="mt-20">
+                    <label for="kaspi-gold-bonus" class="input-label">Бонусы за оплату Kaspi Gold (₸)</label>
+                    <input type="text" id="kaspi-gold-bonus" class="input-field formatted-input" placeholder="Например: 5 000" inputmode="numeric">
                 </div>
 
-                <!-- Поле % для КартаКарта -->
-                <div id="custom-cashback-percent-container" class="hidden mt-15 fade-in">
-                    <label class="input-label">Процент кешбэка</label>
+                <div class="mt-20">
+                    <label class="input-label">Ваш кешбэк по BCC #картакарта</label>
                     <div class="chips-group" id="karta-percent-chips">
                         <button class="chip active" data-percent="5">5%</button>
                         <button class="chip" data-percent="6">6%</button>
                         <button class="chip" data-percent="7">7%</button>
                     </div>
                 </div>
-
-                <!-- Поле суммы для Kaspi Gold -->
-                <div id="custom-cashback-amount-container" class="hidden mt-15 fade-in">
-                    <label for="custom-cashback-amount" class="input-label">Сумма бонусов Kaspi (₸)</label>
-                    <input type="text" id="custom-cashback-amount" class="input-field formatted-input" placeholder="Например: 15 000" inputmode="numeric">
-                </div>
-
-                <div class="result-row mt-15" style="border-top: none; padding-bottom: 0;">
-                    <span style="color: var(--text-muted);">Кешбэк:</span>
-                    <strong id="calc-cashback-amount" class="text-green">0 ₸</strong>
-                </div>
-                
-                <div id="grace-period-container" class="hidden fade-in">
-                    <div class="result-row" style="border-top: none; padding-bottom: 0; padding-top: 8px;">
-                        <span style="color: var(--text-muted); font-size: 14px;">Доход депозита (85 дней без %):</span>
-                        <strong id="calc-grace-interest" class="text-green" style="font-size: 16px;">0 ₸</strong>
-                    </div>
-                    <div class="result-row" style="border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 12px;">
-                        <span style="color: var(--text-main);">Общая выгода картой:</span>
-                        <strong id="calc-total-card-benefit" class="text-green">0 ₸</strong>
-                    </div>
-                </div>
-
-                <div id="bcc-karta-warning" class="warning-text hidden">
-                    Лимит кешбэка 20 000 ₸.
-                </div>
             </section>
 
             <!-- Секция: Рассрочка и Депозит -->
             <section class="card">
                 <div class="installment-header">
-                    <h2>В рассрочку</h2>
+                    <h2>Настройки рассрочки</h2>
                     <label class="fire-toggle">
                         <input type="checkbox" id="kaspi-promo-toggle">
                         <span class="fire-icon">🔥</span> Бонусы
@@ -105,7 +46,7 @@
                 </div>
                 
                 <div id="installment-bonus-container" class="hidden fade-in" style="margin-bottom: 20px;">
-                    <label for="installment-bonus" class="input-label">Сумма бонусов за рассрочку (₸)</label>
+                    <label for="installment-bonus" class="input-label">Дают бонусы за рассрочку? (₸)</label>
                     <input type="text" id="installment-bonus" class="input-field formatted-input" placeholder="0" inputmode="numeric">
                 </div>
 
@@ -115,11 +56,6 @@
                     <button class="chip" data-months="6">6</button>
                     <button class="chip active" data-months="12">12</button>
                     <button class="chip" data-months="24">24</button>
-                </div>
-
-                <div class="result-row mt-15" style="border-top: none;">
-                    <span style="color: var(--text-muted);">Ежемесячный платеж:</span>
-                    <strong id="calc-monthly-payment">0 ₸</strong>
                 </div>
 
                 <h3 class="mt-20">Где лежат наличные?</h3>
@@ -141,22 +77,58 @@
                         <div class="radio-indicator"></div>
                     </label>
                 </div>
-
-                <div class="result-row mt-15" style="border-top: none;">
-                    <span style="color: var(--text-muted);">Доход по депозиту:</span>
-                    <strong id="calc-total-interest" class="text-green">0 ₸</strong>
-                </div>
             </section>
 
             <!-- Секция: Итоги и Досрочное погашение -->
-            <section class="card summary-card">
-                <h2>Что выгоднее?</h2>
-                <p id="summary-text" class="summary-text">Введите стоимость товара, чтобы увидеть расчет.</p>
+            <section class="card summary-card" style="padding: 0; background: transparent; box-shadow: none;">
+                <h2 style="padding: 0 16px; margin-bottom: 12px; color: var(--text-main);">Сравнение выгоды</h2>
                 
-                <div class="early-payoff-box hidden fade-in" id="early-payoff-box">
-                    <div class="payoff-title">Досрочное погашение</div>
-                    <div class="payoff-desc">
-                        Чтобы проценты на депозите превысили недополученный кешбэк, рассрочку можно полностью закрыть через:
+                <div class="list-group" style="background: white; border-radius: 16px; padding: 8px 16px;">
+                    <!-- КартаКарта -->
+                    <div class="list-item result-item" id="res-karta">
+                        <img src="kartakarta.png" alt="#картакарта" class="card-img" style="width: 40px; height: 28px;">
+                        <div class="list-content">
+                            <span class="list-title">BCC #картакарта</span>
+                            <span class="list-desc" id="desc-karta">Кешбэк + 85 дней</span>
+                        </div>
+                        <strong class="text-green" id="val-karta">0 ₸</strong>
+                    </div>
+
+                    <!-- Рассрочка -->
+                    <div class="list-item result-item" id="res-inst">
+                        <div class="card-img" style="width: 40px; height: 28px; background: #f14635; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;">%</div>
+                        <div class="list-content">
+                            <span class="list-title">В рассрочку</span>
+                            <span class="list-desc" id="desc-inst">Проценты + Бонус</span>
+                        </div>
+                        <strong class="text-green" id="val-inst">0 ₸</strong>
+                    </div>
+
+                    <!-- Kaspi Gold -->
+                    <div class="list-item result-item" id="res-gold">
+                        <img src="kaspigold.png" alt="Kaspi Gold" class="card-img" style="width: 40px; height: 28px;">
+                        <div class="list-content">
+                            <span class="list-title">Kaspi Gold</span>
+                            <span class="list-desc">Бонусы</span>
+                        </div>
+                        <strong class="text-green" id="val-gold">0 ₸</strong>
+                    </div>
+
+                    <!-- IronCard -->
+                    <div class="list-item result-item" id="res-iron">
+                        <img src="ironcard.png" alt="IronCard" class="card-img" style="width: 40px; height: 28px;">
+                        <div class="list-content">
+                            <span class="list-title">BCC ironCard</span>
+                            <span class="list-desc">Кешбэк 4%</span>
+                        </div>
+                        <strong class="text-green" id="val-iron">0 ₸</strong>
+                    </div>
+                </div>
+                
+                <div class="early-payoff-box hidden fade-in mt-15" id="early-payoff-box" style="margin: 16px;">
+                    <div class="payoff-title">Досрочное погашение рассрочки</div>
+                    <div class="payoff-desc" id="payoff-desc">
+                        Чтобы обогнать лучшую карту, закройте рассрочку полностью через:
                     </div>
                     <div class="payoff-month" id="payoff-month">На 5-й месяц</div>
                 </div>

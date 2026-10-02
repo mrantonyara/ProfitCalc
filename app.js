@@ -1,59 +1,45 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Елементы DOM
+    // Вводы
     const priceInput = document.getElementById('item-price');
-    const cardRadios = document.querySelectorAll('input[name="card-type"]');
-    
-    const customCashbackPercentContainer = document.getElementById('custom-cashback-percent-container');
+    const kaspiGoldBonusInput = document.getElementById('kaspi-gold-bonus');
     const kartaPercentChips = document.querySelectorAll('#karta-percent-chips .chip');
     
-    const customCashbackAmountContainer = document.getElementById('custom-cashback-amount-container');
-    const customCashbackAmountInput = document.getElementById('custom-cashback-amount');
-    
-    const bccKartaWarning = document.getElementById('bcc-karta-warning');
-    const calcCashbackAmount = document.getElementById('calc-cashback-amount');
-    
-    // Грейс-период
-    const gracePeriodContainer = document.getElementById('grace-period-container');
-    const calcGraceInterest = document.getElementById('calc-grace-interest');
-    const calcTotalCardBenefit = document.getElementById('calc-total-card-benefit');
-    
-    const monthChips = document.querySelectorAll('#installment-months .chip');
-    const calcMonthlyPayment = document.getElementById('calc-monthly-payment');
-    
+    // Рассрочка
     const kaspiPromoToggle = document.getElementById('kaspi-promo-toggle');
     const installmentBonusContainer = document.getElementById('installment-bonus-container');
     const installmentBonusInput = document.getElementById('installment-bonus');
-
+    const monthChips = document.querySelectorAll('#installment-months .chip');
     const depositRadios = document.querySelectorAll('input[name="deposit-type"]');
-    const calcTotalInterest = document.getElementById('calc-total-interest');
     
-    const summaryText = document.getElementById('summary-text');
+    // Итоги (DOM элементы)
+    const valKarta = document.getElementById('val-karta');
+    const valInst = document.getElementById('val-inst');
+    const valGold = document.getElementById('val-gold');
+    const valIron = document.getElementById('val-iron');
+    
+    const descKarta = document.getElementById('desc-karta');
+    const descInst = document.getElementById('desc-inst');
+    
     const earlyPayoffBox = document.getElementById('early-payoff-box');
     const payoffMonth = document.getElementById('payoff-month');
 
     // Состояние калькулятора
     let state = {
         price: 0,
-        cardType: 'bcc-iron',
-        customCashbackRate: 5,   
         kaspiGoldBonusAmount: 0, 
+        customCashbackRate: 5,   
         installmentMonths: 12,
         installmentBonus: 0,     
         depositRate: 17.4
     };
 
-    // Форматирование чисел для вывода
-    const formatMoney = (amount) => {
-        return Math.round(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' ₸';
-    };
+    const formatMoney = (amount) => Math.round(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' ₸';
 
-    // Парсинг числа из строки
     const parseNumber = (val) => {
         const rawValue = val.replace(/\s+/g, '');
         return parseFloat(rawValue) || 0;
     };
 
-    // Автоматическое форматирование инпутов с пробелами
     const formattedInputs = document.querySelectorAll('.formatted-input');
     formattedInputs.forEach(input => {
         input.addEventListener('input', (e) => {
@@ -65,37 +51,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Обработчики событий
-    priceInput.addEventListener('input', (e) => {
-        state.price = parseNumber(e.target.value);
-        calculate();
-    });
-
-    cardRadios.forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            state.cardType = e.target.value;
-            
-            if (state.cardType === 'bcc-karta') {
-                customCashbackPercentContainer.classList.remove('hidden');
-                customCashbackAmountContainer.classList.add('hidden');
-                
-                // Сброс к 5% при выборе карты
-                kartaPercentChips.forEach(c => c.classList.remove('active'));
-                kartaPercentChips[0].classList.add('active');
-                state.customCashbackRate = 5;
-            } else if (state.cardType === 'kaspi-gold') {
-                customCashbackPercentContainer.classList.add('hidden');
-                customCashbackAmountContainer.classList.remove('hidden');
-                
-                customCashbackAmountInput.value = '';
-                state.kaspiGoldBonusAmount = 0;
-            } else {
-                customCashbackPercentContainer.classList.add('hidden');
-                customCashbackAmountContainer.classList.add('hidden');
-            }
-            calculate();
-        });
-    });
+    // Слушатели событий
+    priceInput.addEventListener('input', (e) => { state.price = parseNumber(e.target.value); calculate(); });
+    kaspiGoldBonusInput.addEventListener('input', (e) => { state.kaspiGoldBonusAmount = parseNumber(e.target.value); calculate(); });
 
     kartaPercentChips.forEach(chip => {
         chip.addEventListener('click', (e) => {
@@ -104,11 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
             state.customCashbackRate = parseFloat(e.target.dataset.percent);
             calculate();
         });
-    });
-
-    customCashbackAmountInput.addEventListener('input', (e) => {
-        state.kaspiGoldBonusAmount = parseNumber(e.target.value);
-        calculate();
     });
 
     kaspiPromoToggle.addEventListener('change', (e) => {
@@ -122,10 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
         calculate();
     });
 
-    installmentBonusInput.addEventListener('input', (e) => {
-        state.installmentBonus = parseNumber(e.target.value);
-        calculate();
-    });
+    installmentBonusInput.addEventListener('input', (e) => { state.installmentBonus = parseNumber(e.target.value); calculate(); });
 
     monthChips.forEach(chip => {
         chip.addEventListener('click', (e) => {
@@ -138,107 +88,110 @@ document.addEventListener('DOMContentLoaded', () => {
 
     depositRadios.forEach(radio => {
         radio.addEventListener('change', (e) => {
-            if (e.target.value === 'moya-cel') {
-                state.depositRate = 17.4;
-            } else {
-                state.depositRate = 14.5;
-            }
+            state.depositRate = e.target.value === 'moya-cel' ? 17.4 : 14.5;
             calculate();
         });
     });
 
-    // Главная логика расчета
+    // Главная логика
     function calculate() {
         if (state.price <= 0) {
-            calcCashbackAmount.textContent = '0 ₸';
-            calcMonthlyPayment.textContent = '0 ₸';
-            calcTotalInterest.textContent = '0 ₸';
-            gracePeriodContainer.classList.add('hidden');
-            summaryText.textContent = 'Введите стоимость товара, чтобы увидеть расчет.';
+            valKarta.textContent = '0 ₸';
+            valInst.textContent = '0 ₸';
+            valGold.textContent = '0 ₸';
+            valIron.textContent = '0 ₸';
             earlyPayoffBox.classList.add('hidden');
-            bccKartaWarning.classList.add('hidden');
+            
+            // Сброс стилей лучших вариантов
+            document.querySelectorAll('.result-item').forEach(el => {
+                el.style.background = 'transparent';
+                el.style.border = 'none';
+            });
             return;
         }
 
-        // 1. Расчет кешбэка при покупке сразу картой
-        let cardCashback = 0;
-        let isBccKartaCapped = false;
-        let graceInterest = 0;
+        // 1. BCC ironCard
+        const ironBenefit = state.price * 0.04;
 
-        if (state.cardType === 'bcc-iron') {
-            cardCashback = state.price * 0.04;
-        } else if (state.cardType === 'bcc-karta') {
-            cardCashback = state.price * (state.customCashbackRate / 100);
-            if (cardCashback > 20000) {
-                cardCashback = 20000;
-                isBccKartaCapped = true;
-            }
-            // Выгода за 85 дней (грейс-период)
-            // (Стоимость * Годовая ставка / 365) * 85 дней
-            graceInterest = state.price * (state.depositRate / 100 / 365) * 85;
-        } else if (state.cardType === 'kaspi-gold') {
-            cardCashback = state.kaspiGoldBonusAmount;
-        }
+        // 2. Kaspi Gold
+        const goldBenefit = state.kaspiGoldBonusAmount;
 
-        calcCashbackAmount.textContent = formatMoney(cardCashback);
-        
-        const totalCardBenefit = cardCashback + graceInterest;
+        // 3. BCC #картакарта (кешбэк + грейс 85 дней)
+        let kartaCashback = state.price * (state.customCashbackRate / 100);
+        if (kartaCashback > 20000) kartaCashback = 20000;
+        const graceInterest = state.price * (state.depositRate / 100 / 365) * 85;
+        const kartaBenefit = kartaCashback + graceInterest;
 
-        if (state.cardType === 'bcc-karta') {
-            gracePeriodContainer.classList.remove('hidden');
-            calcGraceInterest.textContent = formatMoney(graceInterest);
-            calcTotalCardBenefit.textContent = formatMoney(totalCardBenefit);
-        } else {
-            gracePeriodContainer.classList.add('hidden');
-        }
-
-        if (isBccKartaCapped) {
-            bccKartaWarning.classList.remove('hidden');
-        } else {
-            bccKartaWarning.classList.add('hidden');
-        }
-
-        // 2. Расчет рассрочки и депозита
-        const monthlyPayment = state.price / state.installmentMonths;
-        calcMonthlyPayment.textContent = formatMoney(monthlyPayment);
-
+        // 4. Рассрочка (депозит + бонус)
         let balance = state.price;
-        let totalInterest = 0;
+        let instInterest = 0;
+        const monthlyPayment = state.price / state.installmentMonths;
         const monthlyRate = (state.depositRate / 100) / 12;
-        let earlyPayoffMonth = -1;
 
+        let interestHistory = [];
         for (let m = 1; m <= state.installmentMonths; m++) {
             const interest = balance * monthlyRate;
-            totalInterest += interest;
+            instInterest += interest;
             balance = balance + interest - monthlyPayment;
+            interestHistory.push(instInterest);
+        }
+        const instBenefit = instInterest + state.installmentBonus;
 
-            // Считаем досрочное погашение, сравнивая с общей выгодой по карте
-            if (earlyPayoffMonth === -1 && (totalInterest + state.installmentBonus) >= totalCardBenefit) {
-                earlyPayoffMonth = m;
+        // Обновляем UI значений
+        valIron.textContent = formatMoney(ironBenefit);
+        valGold.textContent = formatMoney(goldBenefit);
+        valKarta.textContent = formatMoney(kartaBenefit);
+        valInst.textContent = formatMoney(instBenefit);
+
+        descKarta.textContent = kartaCashback >= 20000 ? `Лимит 20к + ${formatMoney(graceInterest)} грейс` : `Кешбэк + ${formatMoney(graceInterest)} грейс`;
+        descInst.textContent = state.installmentBonus > 0 ? `Проценты + ${formatMoney(state.installmentBonus)} бонус` : `Доход по депозиту`;
+
+        // Определяем победителя
+        const benefits = [
+            { id: 'res-karta', val: kartaBenefit },
+            { id: 'res-inst', val: instBenefit },
+            { id: 'res-gold', val: goldBenefit },
+            { id: 'res-iron', val: ironBenefit }
+        ];
+        
+        // Сортируем DOM элементы (по желанию можно менять порядок в DOM, но лучше просто подсветить)
+        benefits.sort((a, b) => b.val - a.val);
+        const maxVal = benefits[0].val;
+
+        // Подсвечиваем самый выгодный (и убираем с остальных)
+        document.querySelectorAll('.result-item').forEach(el => {
+            if (el.id === benefits[0].id && maxVal > 0) {
+                el.style.background = '#f2fff5'; // Light green
+                el.style.border = '1px solid #2ecc71';
+                el.style.borderRadius = '12px';
+                el.style.padding = '8px';
+                el.style.margin = '4px -8px'; // Compensate padding
+            } else {
+                el.style.background = 'transparent';
+                el.style.border = 'none';
+                el.style.padding = '16px 0';
+                el.style.margin = '0';
+            }
+        });
+
+        // Досрочное погашение
+        // Находим лучший карточный метод
+        const bestCardBenefit = Math.max(ironBenefit, goldBenefit, kartaBenefit);
+        let earlyMonth = -1;
+
+        if (instBenefit > bestCardBenefit) {
+            for (let m = 0; m < state.installmentMonths; m++) {
+                if ((interestHistory[m] + state.installmentBonus) >= bestCardBenefit) {
+                    earlyMonth = m + 1;
+                    break;
+                }
             }
         }
 
-        calcTotalInterest.textContent = formatMoney(totalInterest);
-
-        // 3. Сравнение и вердикт
-        const totalInstallmentBenefit = totalInterest + state.installmentBonus;
-
-        if (totalInstallmentBenefit > totalCardBenefit) {
-            let bonusText = state.installmentBonus > 0 ? ` + акция ${formatMoney(state.installmentBonus)}` : '';
-            summaryText.innerHTML = `Выгоднее взять в <strong>рассрочку</strong>! <br>Вы заработаете на депозите <span class="text-green">${formatMoney(totalInterest)}</span>${bonusText}, что в сумме больше выгоды от покупки картой (<span class="text-green">${formatMoney(totalCardBenefit)}</span>).`;
-            
-            if (earlyPayoffMonth !== -1 && earlyPayoffMonth <= state.installmentMonths) {
-                earlyPayoffBox.classList.remove('hidden');
-                payoffMonth.textContent = `На ${earlyPayoffMonth}-й месяц`;
-            } else {
-                earlyPayoffBox.classList.add('hidden');
-            }
-        } else if (totalCardBenefit > totalInstallmentBenefit) {
-            let extraText = state.cardType === 'bcc-karta' ? ` (кешбэк + проценты за 85 дней)` : '';
-            summaryText.innerHTML = `Выгоднее <strong>купить сразу картой</strong>! <br>Ваша выгода${extraText} составит <span class="text-green">${formatMoney(totalCardBenefit)}</span>, а депозит и бонусы рассрочки за этот срок принесут только <span class="text-green">${formatMoney(totalInstallmentBenefit)}</span>.`;
-            earlyPayoffBox.classList.add('hidden');
+        if (earlyMonth !== -1 && earlyMonth <= state.installmentMonths && maxVal === instBenefit) {
+            earlyPayoffBox.classList.remove('hidden');
+            payoffMonth.textContent = `На ${earlyMonth}-й месяц`;
         } else {
-            summaryText.innerHTML = `Выгода одинакова. Вы получите по <span class="text-green">${formatMoney(totalCardBenefit)}</span> в обоих случаях.`;
             earlyPayoffBox.classList.add('hidden');
         }
     }
