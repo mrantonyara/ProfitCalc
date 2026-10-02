@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cardRadios = document.querySelectorAll('input[name="card-type"]');
     
     const customCashbackPercentContainer = document.getElementById('custom-cashback-percent-container');
-    const customCashbackPercentInput = document.getElementById('custom-cashback-percent');
+    const kartaPercentChips = document.querySelectorAll('#karta-percent-chips .chip');
     
     const customCashbackAmountContainer = document.getElementById('custom-cashback-amount-container');
     const customCashbackAmountInput = document.getElementById('custom-cashback-amount');
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const bccKartaWarning = document.getElementById('bcc-karta-warning');
     const calcCashbackAmount = document.getElementById('calc-cashback-amount');
     
-    const monthChips = document.querySelectorAll('.chip');
+    const monthChips = document.querySelectorAll('#installment-months .chip');
     const calcMonthlyPayment = document.getElementById('calc-monthly-payment');
     
     const kaspiPromoToggle = document.getElementById('kaspi-promo-toggle');
@@ -75,7 +75,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 customCashbackPercentContainer.classList.remove('hidden');
                 customCashbackAmountContainer.classList.add('hidden');
                 
-                customCashbackPercentInput.value = 5;
+                // Сброс к 5% при выборе карты
+                kartaPercentChips.forEach(c => c.classList.remove('active'));
+                kartaPercentChips[0].classList.add('active');
                 state.customCashbackRate = 5;
             } else if (state.cardType === 'kaspi-gold') {
                 customCashbackPercentContainer.classList.add('hidden');
@@ -91,9 +93,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    customCashbackPercentInput.addEventListener('input', (e) => {
-        state.customCashbackRate = parseFloat(e.target.value) || 0;
-        calculate();
+    // Обработчик кнопок процентов для КартаКарта
+    kartaPercentChips.forEach(chip => {
+        chip.addEventListener('click', (e) => {
+            kartaPercentChips.forEach(c => c.classList.remove('active'));
+            e.target.classList.add('active');
+            state.customCashbackRate = parseFloat(e.target.dataset.percent);
+            calculate();
+        });
     });
 
     customCashbackAmountInput.addEventListener('input', (e) => {
