@@ -148,29 +148,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Определяем победителя
         const benefits = [
-            { id: 'res-karta', val: kartaBenefit },
-            { id: 'res-inst', val: instBenefit },
-            { id: 'res-gold', val: goldBenefit },
-            { id: 'res-iron', val: ironBenefit }
+            { id: 'res-karta', val: kartaBenefit, name: 'BCC #картакарта' },
+            { id: 'res-inst', val: instBenefit, name: 'рассрочки' },
+            { id: 'res-gold', val: goldBenefit, name: 'Kaspi Gold' },
+            { id: 'res-iron', val: ironBenefit, name: 'BCC ironCard' }
         ];
         
-        // Сортируем DOM элементы (по желанию можно менять порядок в DOM, но лучше просто подсветить)
-        benefits.sort((a, b) => b.val - a.val);
-        const maxVal = benefits[0].val;
+        const maxVal = Math.max(...benefits.map(b => b.val));
 
-        // Подсвечиваем самый выгодный (и убираем с остальных)
-        document.querySelectorAll('.result-item').forEach(el => {
-            if (el.id === benefits[0].id && maxVal > 0) {
-                el.style.background = '#f2fff5'; // Light green
-                el.style.border = '1px solid #2ecc71';
+        // Подсвечиваем самый выгодный (и убираем с остальных), добавляем подсказки
+        benefits.forEach(item => {
+            const el = document.getElementById(item.id);
+            if (item.val === maxVal && maxVal > 0) {
+                el.style.background = '#fff5f5'; // Light red/pink
+                el.style.border = '1px solid var(--primary)';
                 el.style.borderRadius = '12px';
                 el.style.padding = '8px';
-                el.style.margin = '4px -8px'; // Compensate padding
+                el.style.margin = '4px -8px';
+                el.title = 'Это самый выгодный вариант!';
             } else {
                 el.style.background = 'transparent';
                 el.style.border = 'none';
                 el.style.padding = '16px 0';
                 el.style.margin = '0';
+                if (maxVal > 0) {
+                    const diff = maxVal - item.val;
+                    el.title = `Этот вариант менее выгоден на ${formatMoney(diff)} по сравнению с лучшим способом.`;
+                } else {
+                    el.title = '';
+                }
             }
         });
 

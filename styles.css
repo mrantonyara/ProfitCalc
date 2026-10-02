@@ -262,8 +262,8 @@ body {
     font-weight: 700;
 }
 
-.text-green {
-    color: var(--green) !important;
+.text-red {
+    color: var(--primary) !important;
 }
 
 .hidden {
