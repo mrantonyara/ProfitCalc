@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Умная Покупка</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <h1>Умная Покупка</h1>
+            <p>Введи данные товара, чтобы узнать как выгоднее платить</p>
+        </header>
+
+        <main class="content">
+            <!-- Секция: Стоимость товара -->
+            <section class="card">
+                <label for="item-price" class="input-label">Стоимость товара (₸)</label>
+                <input type="text" id="item-price" class="input-field formatted-input price-input" placeholder="0" inputmode="numeric">
+            </section>
+
+            <!-- Секция: Оплата картой -->
+            <section class="card">
+                <h2>Если купить сразу</h2>
+                
+                <div class="list-group">
+                    <label class="list-item">
+                        <input type="radio" name="card-type" value="bcc-iron" checked>
+                        <img src="ironcard.png" alt="IronCard" class="card-img">
+                        <div class="list-content">
+                            <span class="list-title">BCC ironCard</span>
+                            <span class="list-desc">Кешбэк 4%</span>
+                        </div>
+                        <div class="radio-indicator"></div>
+                    </label>
+                    
+                    <label class="list-item">
+                        <input type="radio" name="card-type" value="bcc-karta">
+                        <img src="kartakarta.png" alt="#картакарта" class="card-img">
+                        <div class="list-content">
+                            <span class="list-title">BCC #картакарта</span>
+                            <span class="list-desc">Лимит 20 000 ₸</span>
+                        </div>
+                        <div class="radio-indicator"></div>
+                    </label>
+                    
+                    <label class="list-item">
+                        <input type="radio" name="card-type" value="kaspi-gold">
+                        <img src="kaspigold.png" alt="Kaspi Gold" class="card-img">
+                        <div class="list-content">
+                            <span class="list-title">Kaspi Gold</span>
+                            <span class="list-desc">Укажу сумму бонусов</span>
+                        </div>
+                        <div class="radio-indicator"></div>
+                    </label>
+                </div>
+
+                <!-- Поле % для КартаКарта -->
+                <div id="custom-cashback-percent-container" class="hidden mt-15 fade-in">
+                    <label for="custom-cashback-percent" class="input-label">Процент кешбэка (%)</label>
+                    <input type="number" id="custom-cashback-percent" class="input-field" placeholder="Например: 5" step="0.1">
+                </div>
+
+                <!-- Поле суммы для Kaspi Gold -->
+                <div id="custom-cashback-amount-container" class="hidden mt-15 fade-in">
+                    <label for="custom-cashback-amount" class="input-label">Сумма бонусов Kaspi (₸)</label>
+                    <input type="text" id="custom-cashback-amount" class="input-field formatted-input" placeholder="Например: 15 000" inputmode="numeric">
+                </div>
+
+                <div class="result-row mt-15" style="border-top: none;">
+                    <span style="color: var(--text-muted);">Кешбэк:</span>
+                    <strong id="calc-cashback-amount" class="text-green">0 ₸</strong>
+                </div>
+                <div id="bcc-karta-warning" class="warning-text hidden">
+                    Лимит кешбэка 20 000 ₸.
+                </div>
+            </section>
+
+            <!-- Секция: Рассрочка и Депозит -->
+            <section class="card">
+                <div class="installment-header">
+                    <h2>В рассрочку</h2>
+                    <label class="fire-toggle">
+                        <input type="checkbox" id="kaspi-promo-toggle">
+                        <span class="fire-icon">🔥</span> Бонусы
+                    </label>
+                </div>
+                
+                <div id="installment-bonus-container" class="hidden fade-in" style="margin-bottom: 20px;">
+                    <label for="installment-bonus" class="input-label">Сумма бонусов за рассрочку (₸)</label>
+                    <input type="text" id="installment-bonus" class="input-field formatted-input" placeholder="0" inputmode="numeric">
+                </div>
+
+                <label class="input-label">Срок (месяцев)</label>
+                <div class="chips-group" id="installment-months">
+                    <button class="chip" data-months="3">3</button>
+                    <button class="chip" data-months="6">6</button>
+                    <button class="chip active" data-months="12">12</button>
+                    <button class="chip" data-months="24">24</button>
+                </div>
+
+                <div class="result-row mt-15" style="border-top: none;">
+                    <span style="color: var(--text-muted);">Ежемесячный платеж:</span>
+                    <strong id="calc-monthly-payment">0 ₸</strong>
+                </div>
+
+                <h3 class="mt-20">Где лежат наличные?</h3>
+                <div class="list-group">
+                    <label class="list-item">
+                        <input type="radio" name="deposit-type" value="moya-cel" checked>
+                        <div class="list-content">
+                            <span class="list-title">Моя цель (17.4%)</span>
+                            <span class="list-desc">Закрыт первые 3 мес</span>
+                        </div>
+                        <div class="radio-indicator"></div>
+                    </label>
+                    <label class="list-item">
+                        <input type="radio" name="deposit-type" value="champion">
+                        <div class="list-content">
+                            <span class="list-title">Чемпион (14.5%)</span>
+                            <span class="list-desc">Снятие без ограничений</span>
+                        </div>
+                        <div class="radio-indicator"></div>
+                    </label>
+                </div>
+
+                <div class="result-row mt-15" style="border-top: none;">
+                    <span style="color: var(--text-muted);">Доход по депозиту:</span>
+                    <strong id="calc-total-interest" class="text-green">0 ₸</strong>
+                </div>
+            </section>
+
+            <!-- Секция: Итоги и Досрочное погашение -->
+            <section class="card summary-card">
+                <h2>Что выгоднее?</h2>
+                <p id="summary-text" class="summary-text">Введите стоимость товара, чтобы увидеть расчет.</p>
+                
+                <div class="early-payoff-box hidden fade-in" id="early-payoff-box">
+                    <div class="payoff-title">Досрочное погашение</div>
+                    <div class="payoff-desc">
+                        Чтобы проценты на депозите превысили недополученный кешбэк, рассрочку можно полностью закрыть через:
+                    </div>
+                    <div class="payoff-month" id="payoff-month">На 5-й месяц</div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
