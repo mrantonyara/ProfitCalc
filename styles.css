@@ -309,27 +309,31 @@ body {
 }
 
 .early-payoff-box {
-    background: linear-gradient(135deg, #ffffff, #fffafa);
-    border: 1px solid #ffebe8;
-    border-radius: 12px;
-    padding: 16px;
+    background-color: #f5f6f8;
+    border: none;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .payoff-title {
     font-weight: 700;
-    color: var(--primary);
-    margin-bottom: 8px;
-    font-size: 16px;
+    color: var(--text-main);
+    font-size: 18px;
+    margin-bottom: 0;
 }
 
 .payoff-desc {
     font-size: 14px;
     color: var(--text-muted);
-    margin-bottom: 12px;
+    margin-bottom: 4px;
+    line-height: 1.4;
 }
 
 .payoff-month {
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 700;
-    color: var(--text-main);
+    color: var(--primary);
 }
