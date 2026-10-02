@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (state.customCashbackRate === 0) {
             kartaBenefit = -1; // Дисквалифицируем
             valKarta.textContent = '—';
-            descKarta.textContent = 'Не выбрано';
+            descKarta.textContent = 'Недоступно';
             resKarta.style.opacity = '0.4';
             resKarta.style.filter = 'grayscale(100%)';
         } else {
@@ -207,23 +207,36 @@ document.addEventListener('DOMContentLoaded', () => {
         // Подсвечиваем самый выгодный (и убираем с остальных), добавляем подсказки
         benefits.forEach(item => {
             const el = document.getElementById(item.id);
+            
+            // Формируем детальное объяснение
+            let explanation = '';
+            if (item.id === 'res-karta') {
+                explanation = `Включает ${formatMoney(kartaCashback)} кешбэка и ${formatMoney(graceInterest)} дохода по депозиту за 85 дней беспроцентного периода.`;
+            } else if (item.id === 'res-inst') {
+                explanation = `Вы заработаете ${formatMoney(instInterest)} процентов на депозите за ${state.installmentMonths} мес.` + (state.installmentBonus > 0 ? ` + ${formatMoney(state.installmentBonus)} по акции.` : '');
+            } else if (item.id === 'res-gold') {
+                explanation = `Вы получите ${formatMoney(goldBenefit)} в виде Kaspi бонусов.`;
+            } else if (item.id === 'res-iron') {
+                explanation = `Вы получите 4% кешбэка деньгами от стоимости товара.`;
+            }
+
             if (item.val === maxVal && maxVal > 0) {
                 el.style.background = '#fff5f5'; // Light red/pink
                 el.style.border = '1px solid var(--primary)';
                 el.style.borderRadius = '12px';
                 el.style.padding = '8px';
                 el.style.margin = '4px -8px';
-                el.title = 'Это самый выгодный вариант!';
+                el.title = `🏆 Это самый выгодный вариант!\n${explanation}\nИтоговая выгода: ${formatMoney(item.val)}.`;
             } else {
                 el.style.background = 'transparent';
                 el.style.border = 'none';
                 el.style.padding = '16px 0';
                 el.style.margin = '0';
                 if (item.val === -1) {
-                    el.title = 'Этот способ оплаты сейчас отключен.';
+                    el.title = 'Этот способ оплаты недоступен, так как процент кешбэка установлен на 0.';
                 } else if (maxVal > 0) {
                     const diff = maxVal - item.val;
-                    el.title = `Этот вариант менее выгоден на ${formatMoney(diff)} по сравнению с лучшим способом.`;
+                    el.title = `❌ Уступает лучшему варианту на ${formatMoney(diff)}.\n${explanation}\nИтоговая выгода: ${formatMoney(item.val)}.`;
                 } else {
                     el.title = '';
                 }
