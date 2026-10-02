@@ -271,7 +271,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (earlyMonth !== -1 && earlyMonth <= state.installmentMonths && maxVal === instBenefit) {
             earlyPayoffBox.classList.remove('hidden');
-            payoffMonth.textContent = `На ${earlyMonth}-й месяц`;
+            
+            const date = new Date();
+            date.setMonth(date.getMonth() + earlyMonth);
+            const formatter = new Intl.DateTimeFormat('ru-RU', { month: 'long', year: 'numeric' });
+            let futureDate = formatter.format(date);
+            // Делаем с большой буквы и убираем " г."
+            futureDate = futureDate.charAt(0).toUpperCase() + futureDate.slice(1).replace(' г.', '');
+            
+            payoffMonth.textContent = `На ${earlyMonth}-й месяц (${futureDate})`;
         } else {
             earlyPayoffBox.classList.add('hidden');
         }
