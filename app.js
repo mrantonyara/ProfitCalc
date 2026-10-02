@@ -154,6 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
             valKarta.textContent = '—';
             descKarta.textContent = 'Недоступно';
             valKarta.style.color = '#8e8e93';
+            resKarta.classList.add('disabled-method');
         } else {
             kartaCashback = state.price * (state.customCashbackRate / 100);
             if (kartaCashback > 20000) kartaCashback = 20000;
@@ -170,6 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
             valKarta.textContent = formatMoney(kartaBenefit);
             descKarta.textContent = kartaCashback >= 20000 ? `Лимит 20к + ${formatMoney(graceInterest)} грейс` : `Кешбэк + ${formatMoney(graceInterest)} грейс`;
             valKarta.style.color = '';
+            resKarta.classList.remove('disabled-method');
         }
 
         // 4. Рассрочка (депозит + бонус)
