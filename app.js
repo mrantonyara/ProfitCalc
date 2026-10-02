@@ -133,10 +133,28 @@ document.addEventListener('DOMContentLoaded', () => {
         const goldBenefit = state.kaspiGoldBonusAmount;
 
         // 3. BCC #картакарта (кешбэк + грейс 85 дней)
-        let kartaCashback = state.price * (state.customCashbackRate / 100);
-        if (kartaCashback > 20000) kartaCashback = 20000;
-        const graceInterest = state.price * (state.depositRate / 100 / 365) * 85;
-        const kartaBenefit = kartaCashback + graceInterest;
+        let kartaBenefit = 0;
+        let kartaCashback = 0;
+        let graceInterest = 0;
+        const resKarta = document.getElementById('res-karta');
+
+        if (state.customCashbackRate === 0) {
+            kartaBenefit = -1; // Дисквалифицируем
+            valKarta.textContent = '—';
+            descKarta.textContent = 'Не выбрано';
+            resKarta.style.opacity = '0.4';
+            resKarta.style.filter = 'grayscale(100%)';
+        } else {
+            kartaCashback = state.price * (state.customCashbackRate / 100);
+            if (kartaCashback > 20000) kartaCashback = 20000;
+            graceInterest = state.price * (state.depositRate / 100 / 365) * 85;
+            kartaBenefit = kartaCashback + graceInterest;
+
+            valKarta.textContent = formatMoney(kartaBenefit);
+            descKarta.textContent = kartaCashback >= 20000 ? `Лимит 20к + ${formatMoney(graceInterest)} грейс` : `Кешбэк + ${formatMoney(graceInterest)} грейс`;
+            resKarta.style.opacity = '1';
+            resKarta.style.filter = 'none';
+        }
 
         // 4. Рассрочка (депозит + бонус)
         let balance = state.price;
@@ -172,10 +190,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Обновляем UI значений
         valIron.textContent = formatMoney(ironBenefit);
         valGold.textContent = formatMoney(goldBenefit);
-        valKarta.textContent = formatMoney(kartaBenefit);
         valInst.textContent = formatMoney(instBenefit);
 
-        descKarta.textContent = kartaCashback >= 20000 ? `Лимит 20к + ${formatMoney(graceInterest)} грейс` : `Кешбэк + ${formatMoney(graceInterest)} грейс`;
         descInst.textContent = state.installmentBonus > 0 ? `Проценты + ${formatMoney(state.installmentBonus)} бонус` : `Доход по депозиту`;
 
         // Определяем победителя
@@ -203,7 +219,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 el.style.border = 'none';
                 el.style.padding = '16px 0';
                 el.style.margin = '0';
-                if (maxVal > 0) {
+                if (item.val === -1) {
+                    el.title = 'Этот способ оплаты сейчас отключен.';
+                } else if (maxVal > 0) {
                     const diff = maxVal - item.val;
                     el.title = `Этот вариант менее выгоден на ${formatMoney(diff)} по сравнению с лучшим способом.`;
                 } else {
