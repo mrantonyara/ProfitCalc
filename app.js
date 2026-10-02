@@ -280,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </svg>
             `;
 
-            // Убираем розовый фон, оставляем чистый стиль списка Kaspi
+            // Базовые стили (сброс)
             el.style.background = 'transparent';
             el.style.border = 'none';
             el.style.padding = '16px 0';
@@ -288,6 +288,13 @@ document.addEventListener('DOMContentLoaded', () => {
             el.style.borderRadius = '0';
 
             if (item.val === maxVal && maxVal > 0) {
+                // Подсвечиваем самый выгодный вариант
+                el.style.background = '#fff5f5'; // Светло-красный/розовый фон
+                el.style.border = '1px solid var(--primary)';
+                el.style.borderRadius = '12px';
+                el.style.padding = '8px';
+                el.style.margin = '4px -8px';
+
                 tooltipEl.innerHTML = `
                     ${tooltipSvgIcon}
                     <div class="info-text">
