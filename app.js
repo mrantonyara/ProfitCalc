@@ -119,6 +119,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Главная логика
     function calculate() {
+        // Обновляем текст ежемесячных платежей в кнопках сроков
+        monthChips.forEach(chip => {
+            const m = parseInt(chip.dataset.months);
+            const pmt = state.price > 0 ? Math.round(state.price / m) : 0;
+            const pmtEl = chip.querySelector('.chip-pmt');
+            if (pmtEl) pmtEl.textContent = formatMoney(pmt) + ' ₸/м';
+        });
+
         if (state.price <= 0) {
             valInst.textContent = '0 ₸';
             valGold.textContent = '0 ₸';
