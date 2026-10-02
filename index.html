@@ -73,10 +73,22 @@
                     <input type="text" id="custom-cashback-amount" class="input-field formatted-input" placeholder="Например: 15 000" inputmode="numeric">
                 </div>
 
-                <div class="result-row mt-15" style="border-top: none;">
+                <div class="result-row mt-15" style="border-top: none; padding-bottom: 0;">
                     <span style="color: var(--text-muted);">Кешбэк:</span>
                     <strong id="calc-cashback-amount" class="text-green">0 ₸</strong>
                 </div>
+                
+                <div id="grace-period-container" class="hidden fade-in">
+                    <div class="result-row" style="border-top: none; padding-bottom: 0; padding-top: 8px;">
+                        <span style="color: var(--text-muted); font-size: 14px;">Доход депозита (85 дней без %):</span>
+                        <strong id="calc-grace-interest" class="text-green" style="font-size: 16px;">0 ₸</strong>
+                    </div>
+                    <div class="result-row" style="border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 12px;">
+                        <span style="color: var(--text-main);">Общая выгода картой:</span>
+                        <strong id="calc-total-card-benefit" class="text-green">0 ₸</strong>
+                    </div>
+                </div>
+
                 <div id="bcc-karta-warning" class="warning-text hidden">
                     Лимит кешбэка 20 000 ₸.
                 </div>
