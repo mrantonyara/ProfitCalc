@@ -346,4 +346,5 @@ document.addEventListener('DOMContentLoaded', () => {
             earlyPayoffBox.classList.add('hidden');
         }
     }
+    calculate();
 });
