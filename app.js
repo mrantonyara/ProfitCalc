@@ -44,6 +44,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const formattedInputs = document.querySelectorAll('.formatted-input');
     formattedInputs.forEach(input => {
+        // Запрет ввода всего, кроме цифр
+        input.addEventListener('keypress', (e) => {
+            if (!/[0-9]/.test(e.key)) {
+                e.preventDefault();
+            }
+        });
+
         input.addEventListener('input', (e) => {
             let val = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/g, '');
             if (val !== '') {
