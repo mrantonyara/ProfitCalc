@@ -23,11 +23,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const earlyPayoffBox = document.getElementById('early-payoff-box');
     const payoffMonth = document.getElementById('payoff-month');
 
+    const instRecBox = document.getElementById('installment-recommendation');
+
     // Состояние калькулятора
     let state = {
         price: 0,
         kaspiGoldBonusAmount: 0, 
-        customCashbackRate: 5,   
+        customCashbackRate: 0,   
         installmentMonths: 12,
         installmentBonus: 0,     
         depositRate: 17.4
@@ -92,6 +94,19 @@ document.addEventListener('DOMContentLoaded', () => {
             calculate();
         });
     });
+    
+    function getInstallmentBenefit(months, price, rate, bonus) {
+        let bal = price;
+        let totInt = 0;
+        const mRate = (rate / 100) / 12;
+        const pmt = price / months;
+        for (let m = 1; m <= months; m++) {
+            const interest = bal * mRate;
+            totInt += interest;
+            bal = bal + interest - pmt;
+        }
+        return totInt + bonus;
+    }
 
     // Главная логика
     function calculate() {
@@ -101,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
             valGold.textContent = '0 ₸';
             valIron.textContent = '0 ₸';
             earlyPayoffBox.classList.add('hidden');
+            instRecBox.classList.add('hidden');
             
             // Сброс стилей лучших вариантов
             document.querySelectorAll('.result-item').forEach(el => {
@@ -136,6 +152,22 @@ document.addEventListener('DOMContentLoaded', () => {
             interestHistory.push(instInterest);
         }
         const instBenefit = instInterest + state.installmentBonus;
+        
+        // Рекомендация по рассрочке
+        const maxInstBenefit = getInstallmentBenefit(24, state.price, state.depositRate, state.installmentBonus);
+        instRecBox.classList.remove('hidden');
+        if (state.installmentMonths < 24) {
+            const diff = maxInstBenefit - instBenefit;
+            instRecBox.style.color = '#d35400';
+            instRecBox.style.background = '#fdf2e9';
+            instRecBox.style.borderColor = '#fcecdb';
+            instRecBox.innerHTML = `💡 <strong>Совет:</strong> выберите 24 месяца. Деньги дольше пролежат на депозите, и вы заработаете еще <strong>+${formatMoney(diff)}</strong>.`;
+        } else {
+            instRecBox.style.color = '#27ae60';
+            instRecBox.style.background = '#eef8f1';
+            instRecBox.style.borderColor = '#bcf0c2';
+            instRecBox.innerHTML = `💡 <strong>Отличный выбор!</strong> 24 месяца дадут максимальный доход по депозиту.`;
+        }
 
         // Обновляем UI значений
         valIron.textContent = formatMoney(ironBenefit);

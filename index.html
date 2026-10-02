@@ -6,14 +6,8 @@
     <title>Умная Покупка</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-</head>
 <body>
     <div class="app-container">
-        <header class="header">
-            <h1>Умная Покупка</h1>
-            <p>Введи данные товара, чтобы узнать как выгоднее платить</p>
-        </header>
-
         <main class="content">
             <!-- Ввод данных -->
             <section class="card">
@@ -28,9 +22,9 @@
                 <div class="mt-20">
                     <label class="input-label">Ваш кешбэк по BCC #картакарта</label>
                     <div class="chips-group" id="karta-percent-chips">
-                        <button class="chip" data-percent="0">Нет</button>
+                        <button class="chip active" data-percent="0">Нет</button>
                         <button class="chip" data-percent="4">4%</button>
-                        <button class="chip active" data-percent="5">5%</button>
+                        <button class="chip" data-percent="5">5%</button>
                         <button class="chip" data-percent="6">6%</button>
                         <button class="chip" data-percent="7">7%</button>
                     </div>
@@ -58,6 +52,9 @@
                     <button class="chip" data-months="6">6</button>
                     <button class="chip active" data-months="12">12</button>
                     <button class="chip" data-months="24">24</button>
+                </div>
+                
+                <div id="installment-recommendation" class="warning-text hidden" style="background: #eef8f1; color: #2ecc71; margin-top: 12px; border: 1px solid #bcf0c2;">
                 </div>
 
                 <h3 class="mt-20">Где лежат наличные?</h3>
