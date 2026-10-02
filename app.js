@@ -133,8 +133,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let ironCashback = state.price * 0.04;
         let ironBenefit = ironCashback * Math.pow(1 + monthlyRate, state.installmentMonths);
 
-        // 2. Kaspi Gold
-        let goldBenefit = state.kaspiGoldBonusAmount * Math.pow(1 + monthlyRate, state.installmentMonths);
+        // 2. Kaspi Gold (Бонусы нельзя положить на депозит, поэтому не капитализируем)
+        let goldBenefit = state.kaspiGoldBonusAmount;
 
         // 3. BCC #картакарта (кешбэк + грейс 85 дней)
         let kartaBenefit = 0;
@@ -225,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (item.id === 'res-inst') {
                 explanation = `Вы заработаете ${formatMoney(instInterest)} процентов на депозите за ${state.installmentMonths} мес.` + (state.installmentBonus > 0 ? ` + ${formatMoney(state.installmentBonus)} по акции.` : '');
             } else if (item.id === 'res-gold') {
-                explanation = `Вы получите ${formatMoney(state.kaspiGoldBonusAmount)} Kaspi бонусов сразу, и они (как эквивалент денег) принесут процент на депозите за ${state.installmentMonths} мес.`;
+                explanation = `Вы получите ${formatMoney(state.kaspiGoldBonusAmount)} Kaspi бонусов сразу. (Бонусы нельзя положить на депозит)`;
             } else if (item.id === 'res-iron') {
                 explanation = `Вы получите ${formatMoney(ironCashback)} кешбэка деньгами сразу, и они принесут сложный процент на депозите за ${state.installmentMonths} мес.`;
             }
@@ -266,16 +266,30 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Досрочное погашение
-        // Находим лучший карточный метод
-        const bestCardBenefit = Math.max(ironBenefit, goldBenefit, kartaBenefit);
         let earlyMonth = -1;
-
-        if (instBenefit > bestCardBenefit) {
-            for (let m = 0; m < state.installmentMonths; m++) {
-                if ((interestHistory[m] + state.installmentBonus) >= bestCardBenefit) {
-                    earlyMonth = m + 1;
-                    break;
+        
+        for (let m = 0; m < state.installmentMonths; m++) {
+            let currentMonth = m + 1;
+            
+            // Каким был бы доход от карт, если бы мы остановились на этом месяце?
+            let currentIron = ironCashback * Math.pow(1 + monthlyRate, currentMonth);
+            let currentGold = state.kaspiGoldBonusAmount; // бонусы не капитализируются
+            let currentKarta = -1;
+            
+            if (state.customCashbackRate !== 0) {
+                let remainingKartaMonths = currentMonth - (85 / 30.416);
+                if (remainingKartaMonths > 0) {
+                    currentKarta = baseKarta * Math.pow(1 + monthlyRate, remainingKartaMonths);
+                } else {
+                    currentKarta = baseKarta;
                 }
+            }
+            
+            let currentBestCard = Math.max(currentIron, currentGold, currentKarta);
+            
+            if ((interestHistory[m] + state.installmentBonus) >= currentBestCard) {
+                earlyMonth = currentMonth;
+                break;
             }
         }
 
