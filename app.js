@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             valKarta.textContent = formatMoney(kartaBenefit);
-            descKarta.textContent = kartaCashback >= 20000 ? `Лимит 20к + ${formatMoney(graceInterest)} грейс` : `Кешбэк + ${formatMoney(graceInterest)} грейс`;
+            descKarta.textContent = kartaCashback >= 20000 ? `Лимит 20к + ${formatMoney(graceInterest)} %` : `Кешбэк + ${formatMoney(graceInterest)} %`;
             valKarta.style.color = '';
             resKarta.classList.remove('disabled-method');
         }
@@ -252,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Формируем детальное объяснение
             let explanation = '';
             if (item.id === 'res-karta') {
-                explanation = `Включает ${formatMoney(kartaCashback)} кешбэка и ${formatMoney(graceInterest)} за 85 дней грейса, которые затем продолжат приносить процент на депозите.`;
+                explanation = `Включает ${formatMoney(kartaCashback)} кешбэка и ${formatMoney(graceInterest)} процентов по депозиту за 85 дней без % по карте. Затем сумма продолжит расти.`;
             } else if (item.id === 'res-inst') {
                 explanation = `Вы заработаете ${formatMoney(instInterest)} процентов на депозите за ${state.installmentMonths} мес.` + (state.installmentBonus > 0 ? ` + ${formatMoney(state.installmentBonus)} по акции.` : '');
             } else if (item.id === 'res-gold') {
