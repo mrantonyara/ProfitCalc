@@ -377,25 +377,28 @@ document.addEventListener('DOMContentLoaded', () => {
     calculate();
 });
 
-    // Обработка клика по кнопке "i" для мобилок
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.kaspi-tooltip')) {
-            document.querySelectorAll('.kaspi-tooltip').forEach(tt => tt.classList.remove('show'));
-        }
-        
-        const infoBtn = e.target.closest('.info-btn');
-        if (infoBtn) {
-            const tooltip = infoBtn.closest('.result-item').querySelector('.kaspi-tooltip');
-            if (tooltip) {
-                // Если он уже открыт, закрываем, иначе открываем
-                if (tooltip.classList.contains('show')) {
-                    tooltip.classList.remove('show');
-                } else {
-                    // Закрываем остальные
-                    document.querySelectorAll('.kaspi-tooltip').forEach(tt => tt.classList.remove('show'));
-                    tooltip.classList.add('show');
-                }
-                e.stopPropagation();
-            }
-        }
-    });
+window.toggleTooltip = function(e, btn) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    const tooltip = btn.closest('.result-item').querySelector('.kaspi-tooltip');
+    const isShowing = tooltip && tooltip.classList.contains('show');
+    
+    // Скрываем все остальные
+    document.querySelectorAll('.kaspi-tooltip').forEach(tt => tt.classList.remove('show'));
+    
+    if (tooltip && !isShowing) {
+        tooltip.classList.add('show');
+    }
+};
+
+// Глобальное закрытие при клике вне
+const closeTooltips = (e) => {
+    if (!e.target.closest('.kaspi-tooltip') && !e.target.closest('.info-btn')) {
+        document.querySelectorAll('.kaspi-tooltip').forEach(tt => tt.classList.remove('show'));
+    }
+};
+
+document.addEventListener('click', closeTooltips);
+document.addEventListener('touchstart', closeTooltips, {passive: true});
