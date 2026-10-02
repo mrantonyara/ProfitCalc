@@ -294,7 +294,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                     tooltipEl.innerHTML = '';
                 }
-            }
         });
 
         // Досрочное погашение
