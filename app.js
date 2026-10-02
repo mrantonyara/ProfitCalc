@@ -252,25 +252,46 @@ document.addEventListener('DOMContentLoaded', () => {
             // Очищаем стандартный тултип
             el.removeAttribute('title');
 
+            const tooltipSvgIcon = `
+                <svg class="info-icon" style="flex-shrink: 0;" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="12" fill="#0079C2"/>
+                  <rect x="11" y="10" width="2.5" height="8" rx="1" fill="white"/>
+                  <circle cx="12.25" cy="6.5" r="1.5" fill="white"/>
+                </svg>
+            `;
+
+            // Убираем розовый фон, оставляем чистый стиль списка Kaspi
+            el.style.background = 'transparent';
+            el.style.border = 'none';
+            el.style.padding = '16px 0';
+            el.style.margin = '0';
+            el.style.borderRadius = '0';
+
             if (item.val === maxVal && maxVal > 0) {
-                el.style.background = '#fff5f5'; // Light red/pink
-                el.style.border = '1px solid var(--primary)';
-                el.style.borderRadius = '12px';
-                el.style.padding = '8px';
-                el.style.margin = '4px -8px';
-                
-                tooltipEl.innerHTML = `<div style="color: #2ecc71; font-weight: 700; margin-bottom: 4px;">🏆 Самый выгодный вариант!</div><div style="color: #8e8e93; font-size: 13px; margin-bottom: 6px;">${explanation}</div><div style="font-weight: 700;">Итоговая выгода: <span class="text-red">${formatMoney(item.val)}</span></div>`;
+                tooltipEl.innerHTML = `
+                    ${tooltipSvgIcon}
+                    <div class="info-text">
+                        <div style="font-weight: 700; margin-bottom: 4px; color: #1c1c1e;">Самый выгодный вариант</div>
+                        <div style="color: #333333; margin-bottom: 6px;">${explanation}</div>
+                        <div style="font-weight: 700; color: #1c1c1e;">Итого: <span class="text-red">${formatMoney(item.val)}</span></div>
+                    </div>
+                `;
+            } else if (item.val === -1) {
+                tooltipEl.innerHTML = `
+                    ${tooltipSvgIcon}
+                    <div class="info-text" style="color: #333333;">Этот способ оплаты недоступен (выбран 0%).</div>
+                `;
+            } else if (maxVal > 0) {
+                const diff = maxVal - item.val;
+                tooltipEl.innerHTML = `
+                    ${tooltipSvgIcon}
+                    <div class="info-text">
+                        <div style="font-weight: 700; margin-bottom: 4px; color: #1c1c1e;">Уступает на ${formatMoney(diff)}</div>
+                        <div style="color: #333333; margin-bottom: 6px;">${explanation}</div>
+                        <div style="font-weight: 700; color: #1c1c1e;">Итого: <span class="text-red">${formatMoney(item.val)}</span></div>
+                    </div>
+                `;
             } else {
-                el.style.background = 'transparent';
-                el.style.border = 'none';
-                el.style.padding = '16px 0';
-                el.style.margin = '0';
-                if (item.val === -1) {
-                    tooltipEl.innerHTML = `Этот способ оплаты недоступен, так как процент кешбэка установлен на 0.`;
-                } else if (maxVal > 0) {
-                    const diff = maxVal - item.val;
-                    tooltipEl.innerHTML = `<div style="color: var(--primary); font-weight: 700; margin-bottom: 4px;">❌ Уступает на ${formatMoney(diff)}</div><div style="color: #8e8e93; font-size: 13px; margin-bottom: 6px;">${explanation}</div><div style="font-weight: 700;">Итоговая выгода: <span class="text-red">${formatMoney(item.val)}</span></div>`;
-                } else {
                     tooltipEl.innerHTML = '';
                 }
             }
