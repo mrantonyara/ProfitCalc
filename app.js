@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const m = parseInt(chip.dataset.months);
             const pmt = state.price > 0 ? Math.round(state.price / m) : 0;
             const pmtEl = chip.querySelector('.chip-pmt');
-            if (pmtEl) pmtEl.textContent = formatMoney(pmt) + ' ₸/м';
+            if (pmtEl) pmtEl.textContent = formatMoney(pmt) + '/мес';
         });
 
         if (state.price <= 0) {
