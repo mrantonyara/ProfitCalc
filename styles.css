@@ -337,3 +337,47 @@ body {
     font-weight: 700;
     color: var(--primary);
 }
+
+.result-item {
+    position: relative;
+    cursor: help;
+}
+
+.kaspi-tooltip {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    bottom: calc(100% + 5px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ffffff;
+    border: 1px solid #e5e5ea;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.1);
+    border-radius: 16px;
+    padding: 16px;
+    width: 260px;
+    z-index: 100;
+    font-size: 14px;
+    color: var(--text-main);
+    transition: all 0.2s ease;
+    pointer-events: none;
+    text-align: left;
+    line-height: 1.4;
+}
+
+.kaspi-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -8px;
+    border-width: 8px;
+    border-style: solid;
+    border-color: #ffffff transparent transparent transparent;
+}
+
+.result-item:hover .kaspi-tooltip {
+    visibility: visible;
+    opacity: 1;
+    bottom: calc(100% + 15px);
+}

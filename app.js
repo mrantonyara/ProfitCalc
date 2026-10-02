@@ -220,25 +220,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 explanation = `Вы получите 4% кешбэка деньгами от стоимости товара.`;
             }
 
+            // Создаем или находим кастомный тултип
+            let tooltipEl = el.querySelector('.kaspi-tooltip');
+            if (!tooltipEl) {
+                tooltipEl = document.createElement('div');
+                tooltipEl.className = 'kaspi-tooltip';
+                el.appendChild(tooltipEl);
+            }
+            
+            // Очищаем стандартный тултип
+            el.removeAttribute('title');
+
             if (item.val === maxVal && maxVal > 0) {
                 el.style.background = '#fff5f5'; // Light red/pink
                 el.style.border = '1px solid var(--primary)';
                 el.style.borderRadius = '12px';
                 el.style.padding = '8px';
                 el.style.margin = '4px -8px';
-                el.title = `🏆 Это самый выгодный вариант!\n${explanation}\nИтоговая выгода: ${formatMoney(item.val)}.`;
+                
+                tooltipEl.innerHTML = `<div style="color: #2ecc71; font-weight: 700; margin-bottom: 4px;">🏆 Самый выгодный вариант!</div><div style="color: #8e8e93; font-size: 13px; margin-bottom: 6px;">${explanation}</div><div style="font-weight: 700;">Итоговая выгода: <span class="text-red">${formatMoney(item.val)}</span></div>`;
             } else {
                 el.style.background = 'transparent';
                 el.style.border = 'none';
                 el.style.padding = '16px 0';
                 el.style.margin = '0';
                 if (item.val === -1) {
-                    el.title = 'Этот способ оплаты недоступен, так как процент кешбэка установлен на 0.';
+                    tooltipEl.innerHTML = `Этот способ оплаты недоступен, так как процент кешбэка установлен на 0.`;
                 } else if (maxVal > 0) {
                     const diff = maxVal - item.val;
-                    el.title = `❌ Уступает лучшему варианту на ${formatMoney(diff)}.\n${explanation}\nИтоговая выгода: ${formatMoney(item.val)}.`;
+                    tooltipEl.innerHTML = `<div style="color: var(--primary); font-weight: 700; margin-bottom: 4px;">❌ Уступает на ${formatMoney(diff)}</div><div style="color: #8e8e93; font-size: 13px; margin-bottom: 6px;">${explanation}</div><div style="font-weight: 700;">Итоговая выгода: <span class="text-red">${formatMoney(item.val)}</span></div>`;
                 } else {
-                    el.title = '';
+                    tooltipEl.innerHTML = '';
                 }
             }
         });
