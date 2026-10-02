@@ -19,6 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const descKarta = document.getElementById('desc-karta');
     const descInst = document.getElementById('desc-inst');
+    const resKarta = document.getElementById('res-karta');
+
     
     const earlyPayoffBox = document.getElementById('early-payoff-box');
     const payoffMonth = document.getElementById('payoff-month');
@@ -118,12 +120,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // Главная логика
     function calculate() {
         if (state.price <= 0) {
-            valKarta.textContent = '0 ₸';
             valInst.textContent = '0 ₸';
             valGold.textContent = '0 ₸';
             valIron.textContent = '0 ₸';
             earlyPayoffBox.classList.add('hidden');
             instRecBox.classList.add('hidden');
+            
+            if (state.customCashbackRate === 0) {
+                valKarta.textContent = '—';
+                descKarta.textContent = 'Недоступно';
+                valKarta.style.color = '#8e8e93';
+                resKarta.classList.add('disabled-method');
+            } else {
+                valKarta.textContent = '0 ₸';
+                descKarta.textContent = 'Кешбэк + 85 дней';
+                valKarta.style.color = '';
+                resKarta.classList.remove('disabled-method');
+            }
             
             // Сброс стилей лучших вариантов
             document.querySelectorAll('.result-item').forEach(el => {
@@ -147,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let kartaBenefit = 0;
         let kartaCashback = 0;
         let graceInterest = 0;
-        const resKarta = document.getElementById('res-karta');
+        
 
         if (state.customCashbackRate === 0) {
             kartaBenefit = -1; // Дисквалифицируем
