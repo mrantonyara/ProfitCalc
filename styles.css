@@ -238,8 +238,10 @@ body {
     color: #d35400;
 }
 
-.fire-icon {
-    font-size: 16px;
+.fire-img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
 }
 
 .fire-toggle input {
