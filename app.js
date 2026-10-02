@@ -184,17 +184,28 @@ document.addEventListener('DOMContentLoaded', () => {
         // Рекомендация по рассрочке
         const maxInstBenefit = getInstallmentBenefit(24, state.price, state.depositRate, state.installmentBonus);
         instRecBox.classList.remove('hidden');
+        const svgIcon = `
+            <svg class="info-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="12" fill="#0079C2"/>
+              <rect x="11" y="10" width="2.5" height="8" rx="1" fill="white"/>
+              <circle cx="12.25" cy="6.5" r="1.5" fill="white"/>
+            </svg>
+        `;
+
         if (state.installmentMonths < 24) {
             const diff = maxInstBenefit - instBenefit;
-            instRecBox.style.color = '#d35400';
-            instRecBox.style.background = '#fdf2e9';
-            instRecBox.style.borderColor = '#fcecdb';
-            instRecBox.innerHTML = `💡 <strong>Совет:</strong> выберите 24 месяца. Деньги дольше пролежат на депозите, и вы заработаете еще <strong>+${formatMoney(diff)}</strong>.`;
+            // Сбрасываем старые инлайн стили на всякий случай
+            instRecBox.style.cssText = ''; 
+            instRecBox.innerHTML = `
+                ${svgIcon}
+                <div class="info-text">Совет: выберите 24 месяца. Деньги дольше пролежат на депозите, и вы заработаете еще <strong>+${formatMoney(diff)}</strong>.</div>
+            `;
         } else {
-            instRecBox.style.color = '#27ae60';
-            instRecBox.style.background = '#eef8f1';
-            instRecBox.style.borderColor = '#bcf0c2';
-            instRecBox.innerHTML = `💡 <strong>Отличный выбор!</strong> 24 месяца дадут максимальный доход по депозиту.`;
+            instRecBox.style.cssText = ''; 
+            instRecBox.innerHTML = `
+                ${svgIcon}
+                <div class="info-text">Отличный выбор! 24 месяца дадут максимальный доход по депозиту.</div>
+            `;
         }
 
         // Обновляем UI значений

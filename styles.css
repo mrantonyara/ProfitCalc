@@ -381,3 +381,22 @@ body {
     opacity: 1;
     bottom: calc(100% + 15px);
 }
+
+/* Info Box */
+.info-box {
+    background-color: #f0f4fa;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 16px;
+}
+.info-box .info-icon {
+    flex-shrink: 0;
+}
+.info-box .info-text {
+    font-size: 15px;
+    color: #333333;
+    line-height: 1.4;
+}
