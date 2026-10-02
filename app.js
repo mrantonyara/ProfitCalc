@@ -376,3 +376,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     calculate();
 });
+
+    // Обработка клика по кнопке "i" для мобилок
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.kaspi-tooltip')) {
+            document.querySelectorAll('.kaspi-tooltip').forEach(tt => tt.classList.remove('show'));
+        }
+        
+        const infoBtn = e.target.closest('.info-btn');
+        if (infoBtn) {
+            const tooltip = infoBtn.closest('.result-item').querySelector('.kaspi-tooltip');
+            if (tooltip) {
+                // Если он уже открыт, закрываем, иначе открываем
+                if (tooltip.classList.contains('show')) {
+                    tooltip.classList.remove('show');
+                } else {
+                    // Закрываем остальные
+                    document.querySelectorAll('.kaspi-tooltip').forEach(tt => tt.classList.remove('show'));
+                    tooltip.classList.add('show');
+                }
+                e.stopPropagation();
+            }
+        }
+    });
