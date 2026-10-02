@@ -69,8 +69,8 @@ document.addEventListener('DOMContentLoaded', () => {
     kartaPercentChips.forEach(chip => {
         chip.addEventListener('click', (e) => {
             kartaPercentChips.forEach(c => c.classList.remove('active'));
-            e.target.classList.add('active');
-            state.customCashbackRate = parseFloat(e.target.dataset.percent);
+            chip.classList.add('active');
+            state.customCashbackRate = parseFloat(chip.dataset.percent);
             calculate();
         });
     });
@@ -91,8 +91,8 @@ document.addEventListener('DOMContentLoaded', () => {
     monthChips.forEach(chip => {
         chip.addEventListener('click', (e) => {
             monthChips.forEach(c => c.classList.remove('active'));
-            e.target.classList.add('active');
-            state.installmentMonths = parseInt(e.target.dataset.months);
+            chip.classList.add('active');
+            state.installmentMonths = parseInt(chip.dataset.months);
             calculate();
         });
     });
