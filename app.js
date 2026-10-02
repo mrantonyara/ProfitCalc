@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const formatMoney = (amount) => Math.round(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' ₸';
 
     const parseNumber = (val) => {
-        const rawValue = val.replace(/\s+/g, '');
+        const rawValue = val.replace(/[^\d.]/g, '');
         return parseFloat(rawValue) || 0;
     };
 
@@ -123,7 +123,17 @@ document.addEventListener('DOMContentLoaded', () => {
         monthChips.forEach(chip => {
             const m = parseInt(chip.dataset.months);
             const pmt = state.price > 0 ? Math.round(state.price / m) : 0;
-            const pmtEl = chip.querySelector('.chip-pmt');
+            let pmtEl = chip.querySelector('.chip-pmt');
+            
+            // Fallback for aggressively cached mobile browsers
+            if (!pmtEl) {
+                chip.innerHTML = `
+                    <div style="font-size: 16px;">${m} мес</div>
+                    <div class="chip-pmt" style="font-size: 11px; font-weight: 400; margin-top: 4px; opacity: 0.9;"></div>
+                `;
+                pmtEl = chip.querySelector('.chip-pmt');
+            }
+            
             if (pmtEl) pmtEl.textContent = formatMoney(pmt) + '/мес';
         });
 
