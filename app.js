@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Состояние калькулятора
 
-    const formatMoney = (amount) => Math.round(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' ₸';
+    const formatMoney = (amount) => Math.round(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0") + "\u00A0₸";
 
     const parseNumber = (val) => {
         const rawValue = val.replace(/[^\d.]/g, '');
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         input.addEventListener('input', (e) => {
             let val = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/g, '');
             if (val !== '') {
-                val = val.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+                val = val.replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0");
             }
             e.target.value = val;
         });
@@ -149,9 +149,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (state.price <= 0) {
-            valInst.textContent = '0 ₸';
-            valGold.textContent = '0 ₸';
-            valIron.textContent = '0 ₸';
+            valInst.textContent = '0\u00A0₸';
+            valGold.textContent = '0\u00A0₸';
+            valIron.textContent = '0\u00A0₸';
             valInst.style.color = '#1c1c1e';
             valGold.style.color = '#1c1c1e';
             valIron.style.color = '#1c1c1e';
@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 valKarta.style.color = '#8e8e93';
                 resKarta.classList.add('disabled-method');
             } else {
-                valKarta.textContent = '0 ₸';
+                valKarta.textContent = '0\u00A0₸';
                 descKarta.textContent = 'Кешбэк + 85 дней';
                 valKarta.style.color = '#1c1c1e';
                 resKarta.classList.remove('disabled-method');
@@ -201,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
         earnedInterest += delayInt;
         
         if (diffDays > 0) {
-            window.schedules.inst.push({ date: `Ожидание (${diffDays} дн.)`, balance: formatMoney(depositBalance), interest: `+${formatMoney(delayInt)}`, payment: "0 ₸" });
+            window.schedules.inst.push({ date: `Ожидание (${diffDays} дн.)`, balance: formatMoney(depositBalance), interest: `+${formatMoney(delayInt)}`, payment: "0\u00A0₸" });
         }
 
         for (let m = 1; m <= state.installmentMonths; m++) {
@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 2. Kaspi Gold
         let goldBenefit = state.kaspiGoldBonusAmount;
-        window.schedules.gold.push({ date: "Сразу", balance: "0 ₸", interest: `+${formatMoney(goldBenefit)}`, payment: "0 ₸" });
+        window.schedules.gold.push({ date: "Сразу", balance: "0\u00A0₸", interest: `+${formatMoney(goldBenefit)}`, payment: "0\u00A0₸" });
 
         // 3. BCC ironCard
         let ironCashback = state.price * 0.04;
@@ -229,13 +229,13 @@ document.addEventListener('DOMContentLoaded', () => {
         ironBalance += ironDelayInt;
         
         if (diffDays > 0) {
-            window.schedules.iron.push({ date: `Ожидание (${diffDays} дн.)`, balance: formatMoney(ironBalance), interest: `+${formatMoney(ironDelayInt)}`, payment: "0 ₸" });
+            window.schedules.iron.push({ date: `Ожидание (${diffDays} дн.)`, balance: formatMoney(ironBalance), interest: `+${formatMoney(ironDelayInt)}`, payment: "0\u00A0₸" });
         }
 
         for (let m = 1; m <= state.installmentMonths; m++) {
             let int = ironBalance * monthlyRate;
             ironBalance += int;
-            window.schedules.iron.push({ date: `Месяц ${m}`, balance: formatMoney(ironBalance), interest: `+${formatMoney(int)}`, payment: "0 ₸" });
+            window.schedules.iron.push({ date: `Месяц ${m}`, balance: formatMoney(ironBalance), interest: `+${formatMoney(int)}`, payment: "0\u00A0₸" });
         }
         let ironBenefit = ironBalance;
 
@@ -260,20 +260,20 @@ document.addEventListener('DOMContentLoaded', () => {
             let kartaBalance = baseKarta;
             let remainingMonths = state.installmentMonths - (85 / 30.416);
             
-            window.schedules.karta.push({ date: "Грейс (85 дн.)", balance: formatMoney(kartaBalance), interest: `+${formatMoney(graceInterest)}`, payment: "0 ₸" });
+            window.schedules.karta.push({ date: "Грейс (85 дн.)", balance: formatMoney(kartaBalance), interest: `+${formatMoney(graceInterest)}`, payment: "0\u00A0₸" });
             
             if (remainingMonths > 0) {
                 let remainingFullMonths = Math.floor(remainingMonths);
                 for(let m=1; m<=remainingFullMonths; m++) {
                     let int = kartaBalance * monthlyRate;
                     kartaBalance += int;
-                    window.schedules.karta.push({ date: `След. месяц ${m}`, balance: formatMoney(kartaBalance), interest: `+${formatMoney(int)}`, payment: "0 ₸" });
+                    window.schedules.karta.push({ date: `След. месяц ${m}`, balance: formatMoney(kartaBalance), interest: `+${formatMoney(int)}`, payment: "0\u00A0₸" });
                 }
                 let fraction = remainingMonths - remainingFullMonths;
                 if (fraction > 0) {
                     let int = kartaBalance * (monthlyRate * fraction);
                     kartaBalance += int;
-                    window.schedules.karta.push({ date: `Остаток дней`, balance: formatMoney(kartaBalance), interest: `+${formatMoney(int)}`, payment: "0 ₸" });
+                    window.schedules.karta.push({ date: `Остаток дней`, balance: formatMoney(kartaBalance), interest: `+${formatMoney(int)}`, payment: "0\u00A0₸" });
                 }
                 kartaBenefit = kartaBalance;
             } else {
@@ -281,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             valKarta.textContent = formatMoney(kartaBenefit);
-            descKarta.textContent = kartaCashback >= 20000 ? `Лимит 20к + ${formatMoney(graceInterest)} %` : `Кешбэк + ${formatMoney(graceInterest)} %`;
+            descKarta.textContent = kartaCashback >= 20000 ? `Лимит 20 000 ₸ + ${formatMoney(graceInterest)} %` : `Кешбэк + ${formatMoney(graceInterest)} %`;
             valKarta.style.color = '';
             resKarta.classList.remove('disabled-method');
         }
