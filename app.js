@@ -653,7 +653,7 @@ function simulateKaspiDeposit(startBalance, startDate, events, annualRate) {
     const dateInput = document.getElementById('delivery-date');
     if(dateInput) {
         dateInput.value = `${String(state.deliveryDate.getDate()).padStart(2, '0')}.${String(state.deliveryDate.getMonth() + 1).padStart(2, '0')}.${state.deliveryDate.getFullYear()}`;
-        dateInput.onclick = window.openDateModal;
+        dateInput.addEventListener("click", window.openDateModal); dateInput.addEventListener("touchstart", window.openDateModal);
     }
 
     calculate();
