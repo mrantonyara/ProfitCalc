@@ -624,23 +624,46 @@ window.confirmPdfDownload = function() {
     
     closePdfModal();
 
+    let headers = [];
+    let widths = [];
+    
+    if (type === 'inst') {
+        headers = ['Период', 'Остаток депозита', 'Начисленные %', 'Платеж банку'];
+        widths = ['*', 'auto', 'auto', 'auto'];
+    } else if (type === 'gold') {
+        headers = ['Событие', 'Начисленные Бонусы'];
+        widths = ['*', 'auto'];
+    } else {
+        headers = ['Период', 'Сумма на депозите', 'Начисленные %'];
+        widths = ['*', 'auto', 'auto'];
+    }
+
     const tableBody = [
-        [
-            { text: 'Период', style: 'tableHeader' },
-            { text: 'Остаток депозита', style: 'tableHeader' },
-            { text: 'Начисленные %', style: 'tableHeader' },
-            { text: 'Платеж банку', style: 'tableHeader' }
-        ]
+        headers.map(h => ({ text: h, style: 'tableHeader' }))
     ];
     
     schedule.forEach(row => {
-        // Заменяем символ ₸ на 'тг.' для PDF, так как стандартный шрифт Roboto его не всегда поддерживает
-        tableBody.push([
-            row.date,
-            row.balance.replace(/₸/g, 'тг.'),
-            { text: row.interest.replace(/₸/g, 'тг.'), color: '#0079C2' },
-            { text: row.payment.replace(/₸/g, 'тг.'), color: '#f14635' }
-        ]);
+        let rowData = [];
+        if (type === 'inst') {
+            rowData = [
+                row.date,
+                row.balance.replace(/₸/g, 'тг.'),
+                { text: row.interest.replace(/₸/g, 'тг.'), color: '#0079C2' },
+                { text: row.payment.replace(/₸/g, 'тг.'), color: '#f14635' }
+            ];
+        } else if (type === 'gold') {
+            rowData = [
+                row.date,
+                { text: row.interest.replace(/₸/g, 'тг.'), color: '#0079C2' }
+            ];
+        } else {
+            rowData = [
+                row.date,
+                row.balance.replace(/₸/g, 'тг.'),
+                { text: row.interest.replace(/₸/g, 'тг.'), color: '#0079C2' }
+            ];
+        }
+        tableBody.push(rowData);
     });
 
     const docDefinition = {
@@ -652,7 +675,7 @@ window.confirmPdfDownload = function() {
             {
                 table: {
                     headerRows: 1,
-                    widths: [ '*', 'auto', 'auto', 'auto' ],
+                    widths: widths,
                     body: tableBody
                 },
                 layout: {
