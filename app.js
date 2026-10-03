@@ -616,18 +616,18 @@ window.downloadPDF = function(e, type) {
     
     const container = document.createElement('div');
     container.innerHTML = tableHtml;
-    // Position it at the very top so html2canvas captures it perfectly
-    container.style.position = 'absolute';
-    container.style.top = '0';
-    container.style.left = '0';
     container.style.width = '800px';
     container.style.backgroundColor = '#ffffff';
-    container.style.zIndex = '9998'; // Below the loading overlay, but above everything else
+    container.style.padding = '20px';
     
-    document.body.appendChild(container);
+    const appContainer = document.querySelector('.app-container');
+    
     document.body.appendChild(loadingOverlay);
     
-    // Scroll to top temporarily to ensure html2canvas captures the absolute positioned element
+    // Hide the app, put container in normal flow to guarantee rendering dimensions
+    appContainer.style.display = 'none';
+    document.body.appendChild(container);
+    
     const originalScroll = window.scrollY;
     window.scrollTo(0, 0);
 
@@ -639,14 +639,19 @@ window.downloadPDF = function(e, type) {
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
     
-    html2pdf().set(opt).from(container).save().then(() => {
-        document.body.removeChild(container);
-        document.body.removeChild(loadingOverlay);
-        window.scrollTo(0, originalScroll);
-    }).catch(err => {
-        console.error('PDF generation error:', err);
-        document.body.removeChild(container);
-        document.body.removeChild(loadingOverlay);
-        window.scrollTo(0, originalScroll);
-    });
+    // Wait for the browser to perform a layout pass so the container has actual dimensions!
+    setTimeout(() => {
+        html2pdf().set(opt).from(container).save().then(() => {
+            document.body.removeChild(container);
+            appContainer.style.display = '';
+            document.body.removeChild(loadingOverlay);
+            window.scrollTo(0, originalScroll);
+        }).catch(err => {
+            console.error('PDF generation error:', err);
+            document.body.removeChild(container);
+            appContainer.style.display = '';
+            document.body.removeChild(loadingOverlay);
+            window.scrollTo(0, originalScroll);
+        });
+    }, 150);
 };
