@@ -654,19 +654,19 @@ window.confirmPdfDownload = function() {
             rowData = [
                 row.date,
                 row.balance.replace(/₸/g, 'тг.'),
-                { text: row.interest.replace(/₸/g, 'тг.'), color: '#0079C2' },
+                { text: row.interest.replace(/₸/g, 'тг.'), color: '#12a04b' },
                 { text: row.payment.replace(/₸/g, 'тг.'), color: '#f14635' }
             ];
         } else if (type === 'gold') {
             rowData = [
                 row.date,
-                { text: row.interest.replace(/₸/g, 'тг.'), color: '#0079C2' }
+                { text: row.interest.replace(/₸/g, 'тг.'), color: '#12a04b' }
             ];
         } else { // iron
             rowData = [
                 row.date,
                 row.balance.replace(/₸/g, 'тг.'),
-                { text: row.interest.replace(/₸/g, 'тг.'), color: '#0079C2' }
+                { text: row.interest.replace(/₸/g, 'тг.'), color: '#12a04b' }
             ];
         }
         tableBody.push(rowData);
@@ -677,19 +677,19 @@ window.confirmPdfDownload = function() {
         tableBody.push([
             { text: 'Итого', bold: true },
             '',
-            { text: '+' + formatMoney(totalInterest).replace(/₸/g, 'тг.'), color: '#0079C2', bold: true },
+            { text: '+' + formatMoney(totalInterest).replace(/₸/g, 'тг.'), color: '#12a04b', bold: true },
             { text: formatMoney(totalPayment).replace(/₸/g, 'тг.'), color: '#f14635', bold: true }
         ]);
     } else if (type === 'gold') {
         tableBody.push([
             { text: 'Итого', bold: true },
-            { text: '+' + formatMoney(totalInterest).replace(/₸/g, 'тг.'), color: '#0079C2', bold: true }
+            { text: '+' + formatMoney(totalInterest).replace(/₸/g, 'тг.'), color: '#12a04b', bold: true }
         ]);
     } else { // iron
         tableBody.push([
             { text: 'Итого', bold: true },
             '',
-            { text: '+' + formatMoney(totalInterest).replace(/₸/g, 'тг.'), color: '#0079C2', bold: true }
+            { text: '+' + formatMoney(totalInterest).replace(/₸/g, 'тг.'), color: '#12a04b', bold: true }
         ]);
     }
 
