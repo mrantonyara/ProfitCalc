@@ -88,13 +88,7 @@ window.confirmDateModal = function() {
 };
 
 
-    calSelectedDate.setHours(0,0,0,0);
-    state.deliveryDate = new Date(calSelectedDate);
-    const dateInput = document.getElementById('delivery-date');
-    if(dateInput) {
-        dateInput.value = `${String(state.deliveryDate.getDate()).padStart(2, '0')}.${String(state.deliveryDate.getMonth() + 1).padStart(2, '0')}.${state.deliveryDate.getFullYear()}`;
-        dateInput.onclick = window.openDateModal;
-    }
+
 
 
         const monthNamesRu = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
@@ -625,6 +619,15 @@ function simulateKaspiDeposit(startBalance, startDate, events, annualRate) {
             item.classList.remove('elevated');
         });
     });
+
+
+    calSelectedDate.setHours(0,0,0,0);
+    state.deliveryDate = new Date(calSelectedDate);
+    const dateInput = document.getElementById('delivery-date');
+    if(dateInput) {
+        dateInput.value = `${String(state.deliveryDate.getDate()).padStart(2, '0')}.${String(state.deliveryDate.getMonth() + 1).padStart(2, '0')}.${state.deliveryDate.getFullYear()}`;
+        dateInput.onclick = window.openDateModal;
+    }
 
     calculate();
 });
