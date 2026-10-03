@@ -1,4 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+    let state = {
+        price: 0,
+        kaspiGoldBonusAmount: 0, 
+        customCashbackRate: 0,   
+        installmentMonths: 12,
+        installmentBonus: 0,
+        deliveryDate: null,     
+        depositRate: 17.4
+    };
+
     // Вводы
     const priceInput = document.getElementById('item-price');
     const kaspiGoldBonusInput = document.getElementById('kaspi-gold-bonus');
@@ -38,15 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const instRecBox = document.getElementById('installment-recommendation');
 
     // Состояние калькулятора
-    let state = {
-        price: 0,
-        kaspiGoldBonusAmount: 0, 
-        customCashbackRate: 0,   
-        installmentMonths: 12,
-        installmentBonus: 0,
-        deliveryDate: null,     
-        depositRate: 17.4
-    };
 
     const formatMoney = (amount) => Math.round(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' ₸';
 
