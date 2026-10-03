@@ -6,6 +6,16 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Рассрочка
     const kaspiPromoToggle = document.getElementById('kaspi-promo-toggle');
+    const deliveryDateInput = document.getElementById('delivery-date');
+    if (deliveryDateInput) {
+        deliveryDateInput.valueAsDate = new Date();
+        state.deliveryDate = deliveryDateInput.valueAsDate;
+        deliveryDateInput.addEventListener('change', (e) => {
+            state.deliveryDate = e.target.valueAsDate;
+            calculate();
+        });
+    }
+
     const installmentBonusContainer = document.getElementById('installment-bonus-container');
     const installmentBonusInput = document.getElementById('installment-bonus');
     const monthChips = document.querySelectorAll('#installment-months .chip');
@@ -33,7 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
         kaspiGoldBonusAmount: 0, 
         customCashbackRate: 0,   
         installmentMonths: 12,
-        installmentBonus: 0,     
+        installmentBonus: 0,
+        deliveryDate: null,     
         depositRate: 17.4
     };
 
@@ -64,7 +75,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Слушатели событий
     priceInput.addEventListener('input', (e) => { state.price = parseNumber(e.target.value); calculate(); });
-    kaspiGoldBonusInput.addEventListener('input', (e) => { state.kaspiGoldBonusAmount = parseNumber(e.target.value); calculate(); });
+    kaspiGoldBonusInput.addEventListener('input', (e) => { 
+        state.kaspiGoldBonusAmount = parseNumber(e.target.value); 
+        if (kaspiPromoToggle.checked) state.installmentBonus = state.kaspiGoldBonusAmount;
+        calculate(); 
+    });
 
     kartaPercentChips.forEach(chip => {
         chip.addEventListener('click', (e) => {
@@ -76,17 +91,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     kaspiPromoToggle.addEventListener('change', (e) => {
-        if (e.target.checked) {
-            installmentBonusContainer.classList.remove('hidden');
-        } else {
-            installmentBonusContainer.classList.add('hidden');
-            installmentBonusInput.value = '';
-            state.installmentBonus = 0;
-        }
+        state.installmentBonus = e.target.checked ? state.kaspiGoldBonusAmount : 0;
         calculate();
     });
 
-    installmentBonusInput.addEventListener('input', (e) => { state.installmentBonus = parseNumber(e.target.value); calculate(); });
+    
 
     monthChips.forEach(chip => {
         chip.addEventListener('click', (e) => {
@@ -166,22 +175,73 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Месячная ставка
         const monthlyRate = (state.depositRate / 100) / 12;
+        const dailyRate = (state.depositRate / 100) / 365;
 
-        // 1. BCC ironCard (Кешбэк + процент на кешбэк за время рассрочки)
-        let ironCashback = state.price * 0.04;
-        let ironBenefit = ironCashback * Math.pow(1 + monthlyRate, state.installmentMonths);
+        window.schedules = { inst: [], gold: [], iron: [], karta: [] };
+        
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        let delivery = state.deliveryDate || today;
+        delivery.setHours(0,0,0,0);
+        let diffDays = Math.max(0, Math.ceil((delivery - today) / (1000 * 60 * 60 * 24)));
 
-        // 2. Kaspi Gold (Бонусы нельзя положить на депозит, поэтому не капитализируем)
+        // 1. Рассрочка (депозит + бонус)
+        let depositBalance = state.price;
+        let earnedInterest = 0;
+        let pmt = state.price / state.installmentMonths;
+        let interestHistory = [];
+        
+        let delayInt = depositBalance * dailyRate * diffDays;
+        depositBalance += delayInt;
+        earnedInterest += delayInt;
+        
+        if (diffDays > 0) {
+            window.schedules.inst.push({ date: `Ожидание (${diffDays} дн.)`, balance: formatMoney(depositBalance), interest: `+${formatMoney(delayInt)}`, payment: "0 ₸" });
+        }
+
+        for (let m = 1; m <= state.installmentMonths; m++) {
+            let int = depositBalance * monthlyRate;
+            depositBalance += int;
+            earnedInterest += int;
+            depositBalance -= pmt;
+            
+            window.schedules.inst.push({ date: `Месяц ${m}`, balance: formatMoney(Math.max(0, depositBalance)), interest: `+${formatMoney(int)}`, payment: formatMoney(pmt) });
+            interestHistory.push(earnedInterest);
+        }
+        
+        let instInterest = earnedInterest;
+        let instBenefit = instInterest + state.installmentBonus;
+
+        // 2. Kaspi Gold
         let goldBenefit = state.kaspiGoldBonusAmount;
+        window.schedules.gold.push({ date: "Сразу", balance: "0 ₸", interest: `+${formatMoney(goldBenefit)}`, payment: "0 ₸" });
 
-        // 3. BCC #картакарта (кешбэк + грейс 85 дней)
+        // 3. BCC ironCard
+        let ironCashback = state.price * 0.04;
+        let ironBalance = ironCashback;
+        
+        let ironDelayInt = ironBalance * dailyRate * diffDays;
+        ironBalance += ironDelayInt;
+        
+        if (diffDays > 0) {
+            window.schedules.iron.push({ date: `Ожидание (${diffDays} дн.)`, balance: formatMoney(ironBalance), interest: `+${formatMoney(ironDelayInt)}`, payment: "0 ₸" });
+        }
+
+        for (let m = 1; m <= state.installmentMonths; m++) {
+            let int = ironBalance * monthlyRate;
+            ironBalance += int;
+            window.schedules.iron.push({ date: `Месяц ${m}`, balance: formatMoney(ironBalance), interest: `+${formatMoney(int)}`, payment: "0 ₸" });
+        }
+        let ironBenefit = ironBalance;
+
+        // 4. BCC #картакарта
         let kartaBenefit = 0;
         let kartaCashback = 0;
         let graceInterest = 0;
+        let baseKarta = 0;
         
-
         if (state.customCashbackRate === 0) {
-            kartaBenefit = -1; // Дисквалифицируем
+            kartaBenefit = -1;
             valKarta.textContent = '—';
             descKarta.textContent = 'Недоступно';
             valKarta.style.color = '#8e8e93';
@@ -189,12 +249,28 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             kartaCashback = state.price * (state.customCashbackRate / 100);
             if (kartaCashback > 20000) kartaCashback = 20000;
-            graceInterest = state.price * (state.depositRate / 100 / 365) * 85;
+            graceInterest = state.price * dailyRate * 85;
+            baseKarta = kartaCashback + graceInterest;
             
-            let baseKarta = kartaCashback + graceInterest;
+            let kartaBalance = baseKarta;
             let remainingMonths = state.installmentMonths - (85 / 30.416);
+            
+            window.schedules.karta.push({ date: "Грейс (85 дн.)", balance: formatMoney(kartaBalance), interest: `+${formatMoney(graceInterest)}`, payment: "0 ₸" });
+            
             if (remainingMonths > 0) {
-                kartaBenefit = baseKarta * Math.pow(1 + monthlyRate, remainingMonths);
+                let remainingFullMonths = Math.floor(remainingMonths);
+                for(let m=1; m<=remainingFullMonths; m++) {
+                    let int = kartaBalance * monthlyRate;
+                    kartaBalance += int;
+                    window.schedules.karta.push({ date: `След. месяц ${m}`, balance: formatMoney(kartaBalance), interest: `+${formatMoney(int)}`, payment: "0 ₸" });
+                }
+                let fraction = remainingMonths - remainingFullMonths;
+                if (fraction > 0) {
+                    let int = kartaBalance * (monthlyRate * fraction);
+                    kartaBalance += int;
+                    window.schedules.karta.push({ date: `Остаток дней`, balance: formatMoney(kartaBalance), interest: `+${formatMoney(int)}`, payment: "0 ₸" });
+                }
+                kartaBenefit = kartaBalance;
             } else {
                 kartaBenefit = baseKarta;
             }
@@ -205,48 +281,6 @@ document.addEventListener('DOMContentLoaded', () => {
             resKarta.classList.remove('disabled-method');
         }
 
-        // 4. Рассрочка (депозит + бонус)
-        let balance = state.price;
-        let instInterest = 0;
-        const monthlyPayment = state.price / state.installmentMonths;
-
-        let interestHistory = [];
-        for (let m = 1; m <= state.installmentMonths; m++) {
-            const interest = balance * monthlyRate;
-            instInterest += interest;
-            balance = balance + interest - monthlyPayment;
-            interestHistory.push(instInterest);
-        }
-        const instBenefit = instInterest + state.installmentBonus;
-        
-        // Рекомендация по рассрочке
-        const maxInstBenefit = getInstallmentBenefit(24, state.price, state.depositRate, state.installmentBonus);
-        instRecBox.classList.remove('hidden');
-        const svgIcon = `
-            <svg class="info-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="12" fill="#0079C2"/>
-              <rect x="11" y="10" width="2.5" height="8" rx="1" fill="white"/>
-              <circle cx="12.25" cy="6.5" r="1.5" fill="white"/>
-            </svg>
-        `;
-
-        if (state.installmentMonths < 24) {
-            const diff = maxInstBenefit - instBenefit;
-            // Сбрасываем старые инлайн стили на всякий случай
-            instRecBox.style.cssText = ''; 
-            instRecBox.innerHTML = `
-                ${svgIcon}
-                <div class="info-text">Совет: выберите 24 месяца. Деньги дольше пролежат на депозите, и вы заработаете еще <strong>+${formatMoney(diff)}</strong>.</div>
-            `;
-        } else {
-            instRecBox.style.cssText = ''; 
-            instRecBox.innerHTML = `
-                ${svgIcon}
-                <div class="info-text">Отличный выбор! 24 месяца дадут максимальный доход по депозиту.</div>
-            `;
-        }
-
-        // Обновляем UI значений
         valIron.textContent = formatMoney(ironBenefit);
         valGold.textContent = formatMoney(goldBenefit);
         valInst.textContent = formatMoney(instBenefit);
@@ -412,3 +446,66 @@ const closeTooltips = (e) => {
 
 document.addEventListener('click', closeTooltips);
 document.addEventListener('touchstart', closeTooltips, {passive: true});
+
+window.downloadPDF = function(e, type) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    const schedule = window.schedules && window.schedules[type];
+    if (!schedule || schedule.length === 0) return;
+    
+    let title = "График";
+    if (type === 'inst') title = "График платежей по рассрочке";
+    if (type === 'gold') title = "Kaspi Gold (бонусы)";
+    if (type === 'iron') title = "График дохода: BCC ironCard";
+    if (type === 'karta') title = "График дохода: BCC #картакарта";
+
+    let tableHtml = `
+    <div id="pdf-content" style="padding: 30px; font-family: sans-serif; color: #1c1c1e;">
+        <h2 style="color: #f14635; margin-bottom: 20px; text-align: center;">${title}</h2>
+        <table style="width: 100%; border-collapse: collapse; text-align: right; font-size: 14px;">
+            <thead>
+                <tr style="border-bottom: 2px solid #ccc;">
+                    <th style="padding: 10px; text-align: left;">Период</th>
+                    <th style="padding: 10px;">Остаток депозита</th>
+                    <th style="padding: 10px;">Начисленные %</th>
+                    <th style="padding: 10px;">Платеж банку</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    schedule.forEach(row => {
+        tableHtml += `
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 10px; text-align: left;">${row.date}</td>
+                <td style="padding: 10px;">${row.balance}</td>
+                <td style="padding: 10px; color: #0079C2;">${row.interest}</td>
+                <td style="padding: 10px; color: #f14635;">${row.payment}</td>
+            </tr>
+        `;
+    });
+    
+    tableHtml += `</tbody></table></div>`;
+    
+    const container = document.createElement('div');
+    container.innerHTML = tableHtml;
+    // html2pdf needs it in the DOM temporarily or it might struggle with fonts/styles.
+    container.style.position = 'absolute';
+    container.style.top = '-9999px';
+    document.body.appendChild(container);
+    
+    const opt = {
+      margin:       10,
+      filename:     `schedule_${type}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2 },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    
+    html2pdf().set(opt).from(container).save().then(() => {
+        document.body.removeChild(container);
+    });
+};
