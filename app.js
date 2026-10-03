@@ -627,14 +627,14 @@ window.confirmPdfDownload = function() {
     let headers = [];
     let widths = [];
     
-    if (type === 'inst') {
-        headers = ['Период', 'Остаток депозита', 'Начисленные %', 'Платеж банку'];
+    if (type === 'inst' || type === 'karta') {
+        headers = ['Период', 'Остаток депозита', 'Начисления (Кешбэк и %)', 'Платеж банку'];
         widths = ['*', 'auto', 'auto', 'auto'];
     } else if (type === 'gold') {
         headers = ['Событие', 'Начисленные Бонусы'];
         widths = ['*', 'auto'];
-    } else {
-        headers = ['Период', 'Сумма на депозите', 'Начисленные %'];
+    } else { // iron
+        headers = ['Период', 'Сумма на депозите', 'Начисления (Кешбэк и %)'];
         widths = ['*', 'auto', 'auto'];
     }
 
@@ -650,7 +650,7 @@ window.confirmPdfDownload = function() {
         totalPayment += row.rawPayment || 0;
         
         let rowData = [];
-        if (type === 'inst') {
+        if (type === 'inst' || type === 'karta') {
             rowData = [
                 row.date,
                 row.balance.replace(/₸/g, 'тг.'),
@@ -662,7 +662,7 @@ window.confirmPdfDownload = function() {
                 row.date,
                 { text: row.interest.replace(/₸/g, 'тг.'), color: '#0079C2' }
             ];
-        } else {
+        } else { // iron
             rowData = [
                 row.date,
                 row.balance.replace(/₸/g, 'тг.'),
@@ -673,7 +673,7 @@ window.confirmPdfDownload = function() {
     });
 
     // Add Total Row
-    if (type === 'inst') {
+    if (type === 'inst' || type === 'karta') {
         tableBody.push([
             { text: 'Итого', bold: true },
             '',
@@ -685,7 +685,7 @@ window.confirmPdfDownload = function() {
             { text: 'Итого', bold: true },
             { text: '+' + formatMoney(totalInterest).replace(/₸/g, 'тг.'), color: '#0079C2', bold: true }
         ]);
-    } else {
+    } else { // iron
         tableBody.push([
             { text: 'Итого', bold: true },
             '',
