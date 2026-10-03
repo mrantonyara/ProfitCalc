@@ -639,5 +639,15 @@ window.downloadPDF = function(e, type) {
         }
     };
 
-    pdfMake.createPdf(docDefinition).download(`schedule_${type}.pdf`);
+        let fileName = prompt("Введите название для PDF (например: Холодильник), или просто нажмите ОК:", title);
+    if (fileName === null) return; // User cancelled
+    
+    fileName = fileName.trim();
+    if (fileName === '') fileName = title;
+    
+    if (!fileName.toLowerCase().endsWith('.pdf')) {
+        fileName += '.pdf';
+    }
+
+    pdfMake.createPdf(docDefinition).download(fileName);
 };
