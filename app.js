@@ -433,6 +433,27 @@ document.addEventListener('DOMContentLoaded', () => {
             earlyPayoffBox.classList.add('hidden');
         }
     }
+
+    // Desktop hover logic for overlay
+    document.querySelectorAll('.result-item').forEach(item => {
+        item.addEventListener('mouseenter', () => {
+            const tt = item.querySelector('.kaspi-tooltip');
+            if (tt && tt.innerHTML.trim() !== '') {
+                document.body.classList.add('tooltip-active');
+                
+                
+                item.classList.add('elevated'); // Ensure it's not transparent over overlay
+                
+                // slight padding tweak to make it look like a popout if we want, but Kaspi list items are usually flush.
+            }
+        });
+        item.addEventListener('mouseleave', () => {
+            document.body.classList.remove('tooltip-active');
+            
+            item.classList.remove('elevated');
+        });
+    });
+
     calculate();
 });
 
@@ -441,14 +462,26 @@ window.toggleTooltip = function(e, btn) {
         e.preventDefault();
         e.stopPropagation();
     }
-    const tooltip = btn.closest('.result-item').querySelector('.kaspi-tooltip');
+    const item = btn.closest('.result-item');
+    const tooltip = item.querySelector('.kaspi-tooltip');
     const isShowing = tooltip && tooltip.classList.contains('show');
     
     // Скрываем все остальные
     document.querySelectorAll('.kaspi-tooltip').forEach(tt => tt.classList.remove('show'));
+    document.querySelectorAll('.result-item').forEach(ri => {
+        ri.classList.remove('elevated');
+        
+    });
     
     if (tooltip && !isShowing) {
         tooltip.classList.add('show');
+        document.body.classList.add('tooltip-active');
+        
+        
+        item.classList.add('elevated');
+        
+    } else {
+        document.body.classList.remove('tooltip-active');
     }
 };
 
@@ -456,6 +489,11 @@ window.toggleTooltip = function(e, btn) {
 const closeTooltips = (e) => {
     if (!e.target.closest('.kaspi-tooltip') && !e.target.closest('.info-btn')) {
         document.querySelectorAll('.kaspi-tooltip').forEach(tt => tt.classList.remove('show'));
+        document.body.classList.remove('tooltip-active');
+        document.querySelectorAll('.result-item').forEach(ri => {
+            ri.classList.remove('elevated');
+            
+        });
     }
 };
 

@@ -411,3 +411,79 @@ body {
     opacity: 0.4;
     filter: grayscale(100%);
 }
+
+/* Tooltip Overlay (Backdrop) */
+#tooltip-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 99;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+body.tooltip-active #tooltip-overlay {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Beautiful Date Picker */
+.date-picker-wrapper {
+    position: relative;
+    margin-bottom: 16px;
+}
+.date-picker-wrapper input[type="date"] {
+    width: 100%;
+    padding: 16px 48px 16px 16px;
+    font-size: 16px;
+    font-family: inherit;
+    font-weight: 500;
+    border: 1px solid #e5e5ea;
+    border-radius: 12px;
+    background-color: #f0f4fa;
+    color: #1c1c1e;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.date-picker-wrapper input[type="date"]:focus {
+    border-color: var(--primary);
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(0, 121, 194, 0.1);
+}
+.date-picker-wrapper svg {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--primary);
+}
+.date-picker-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
+    background: transparent;
+    bottom: 0;
+    color: transparent;
+    cursor: pointer;
+    height: auto;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: auto;
+}
+
+/* Elevated Result Item */
+.result-item.elevated {
+    z-index: 101;
+    position: relative;
+    background-color: #fff !important;
+    border-radius: 12px;
+    padding: 8px 16px !important;
+    margin: 0 -16px !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
