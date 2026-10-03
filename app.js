@@ -150,6 +150,9 @@ document.addEventListener('DOMContentLoaded', () => {
             valInst.textContent = '0 ₸';
             valGold.textContent = '0 ₸';
             valIron.textContent = '0 ₸';
+            valInst.style.color = '#1c1c1e';
+            valGold.style.color = '#1c1c1e';
+            valIron.style.color = '#1c1c1e';
             earlyPayoffBox.classList.add('hidden');
             instRecBox.classList.add('hidden');
             
@@ -161,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 valKarta.textContent = '0 ₸';
                 descKarta.textContent = 'Кешбэк + 85 дней';
-                valKarta.style.color = '';
+                valKarta.style.color = '#1c1c1e';
                 resKarta.classList.remove('disabled-method');
             }
             
@@ -297,9 +300,21 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const maxVal = Math.max(...benefits.map(b => b.val));
 
+        const valueEls = { 'res-karta': valKarta, 'res-inst': valInst, 'res-gold': valGold, 'res-iron': valIron };
+
         // Подсвечиваем самый выгодный (и убираем с остальных), добавляем подсказки
         benefits.forEach(item => {
             const el = document.getElementById(item.id);
+            const valEl = valueEls[item.id];
+            
+            if (item.val === -1) {
+                valEl.style.color = '#8e8e93';
+            } else if (item.val === maxVal && maxVal > 0) {
+                valEl.style.color = '#12a04b'; // Тёмно-зелёный
+            } else {
+                valEl.style.color = '#1c1c1e'; // Чёрный
+            }
+
             
             // Формируем детальное объяснение
             let explanation = '';
@@ -352,7 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="info-text">
                         <div style="font-weight: 700; margin-bottom: 4px; color: #1c1c1e;">Самый выгодный вариант</div>
                         <div style="color: #333333; margin-bottom: 6px;">${explanation}</div>
-                        <div style="font-weight: 700; color: #1c1c1e;">Итого: <span class="text-red">${formatMoney(item.val)}</span></div>
+                        <div style="font-weight: 700; color: #1c1c1e;">Итого: <span style="color: #12a04b;">${formatMoney(item.val)}</span></div>
                     </div>
                 `;
             } else if (item.val === -1) {
@@ -367,7 +382,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="info-text">
                         <div style="font-weight: 700; margin-bottom: 4px; color: #1c1c1e;">Уступает на ${formatMoney(diff)}</div>
                         <div style="color: #333333; margin-bottom: 6px;">${explanation}</div>
-                        <div style="font-weight: 700; color: #1c1c1e;">Итого: <span class="text-red">${formatMoney(item.val)}</span></div>
+                        <div style="font-weight: 700; color: #1c1c1e;">Итого: <span style="color: #12a04b;">${formatMoney(item.val)}</span></div>
                     </div>
                 `;
             } else {
