@@ -581,11 +581,12 @@ window.downloadPDF = function(e, type) {
     ];
     
     schedule.forEach(row => {
+        // Заменяем символ ₸ на 'тг.' для PDF, так как стандартный шрифт Roboto его не всегда поддерживает
         tableBody.push([
             row.date,
-            row.balance,
-            { text: row.interest, color: '#0079C2' },
-            { text: row.payment, color: '#f14635' }
+            row.balance.replace(/₸/g, 'тг.'),
+            { text: row.interest.replace(/₸/g, 'тг.'), color: '#0079C2' },
+            { text: row.payment.replace(/₸/g, 'тг.'), color: '#f14635' }
         ]);
     });
 
