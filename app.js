@@ -194,6 +194,33 @@ function simulateKaspiDeposit(startBalance, startDate, events, annualRate) {
     const kaspiPromoToggle = document.getElementById('kaspi-promo-toggle');
     const deliveryDateInput = document.getElementById('delivery-date');
 
+    
+    // Чтение URL параметров (из iOS Shortcut)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('price')) {
+        let p = parseNumber(urlParams.get('price'));
+        if (p > 0) {
+            state.price = p;
+            priceInput.value = formatMoney(p);
+        }
+    }
+    if (urlParams.has('bonus')) {
+        let b = parseNumber(urlParams.get('bonus'));
+        if (b > 0) {
+            state.kaspiGoldBonusAmount = b;
+            kaspiGoldBonusInput.value = formatMoney(b);
+            if (kaspiPromoToggle.checked) state.installmentBonus = b;
+        }
+    }
+    
+    // Если передано название товара, мы можем предзаполнить его для PDF
+    if (urlParams.has('name')) {
+        let n = urlParams.get('name');
+        currentDownloadTitle = n; // Мы пока сохраним его глобально, чтобы потом подставить в модалку
+        const filenameInput = document.getElementById('pdf-filename-input');
+        if (filenameInput) filenameInput.value = n;
+    }
+
     // Слушатели событий
     priceInput.addEventListener('input', (e) => { state.price = parseNumber(e.target.value); calculate(); });
     kaspiGoldBonusInput.addEventListener('input', (e) => { 
