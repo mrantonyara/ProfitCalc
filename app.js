@@ -19,12 +19,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const kaspiPromoToggle = document.getElementById('kaspi-promo-toggle');
     const deliveryDateInput = document.getElementById('delivery-date');
     if (deliveryDateInput) {
-        deliveryDateInput.valueAsDate = new Date();
-        state.deliveryDate = deliveryDateInput.valueAsDate;
-        deliveryDateInput.addEventListener('change', (e) => {
-            state.deliveryDate = e.target.valueAsDate;
-            calculate();
+        flatpickr(deliveryDateInput, {
+            locale: "ru",
+            defaultDate: new Date(),
+            dateFormat: "d.m.Y",
+            disableMobile: true, // Use flatpickr even on mobile for consistency
+            onChange: function(selectedDates) {
+                if (selectedDates.length > 0) {
+                    state.deliveryDate = selectedDates[0];
+                    calculate();
+                }
+            }
         });
+        state.deliveryDate = new Date();
     }
 
     const installmentBonusContainer = document.getElementById('installment-bonus-container');
@@ -173,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Сброс стилей лучших вариантов
             document.querySelectorAll('.result-item').forEach(el => {
                 el.style.background = 'transparent';
-                el.style.border = 'none';
+                el.style.boxShadow = 'none';
             });
             return;
         }
@@ -321,13 +328,58 @@ document.addEventListener('DOMContentLoaded', () => {
             // Формируем детальное объяснение
             let explanation = '';
             if (item.id === 'res-karta') {
-                explanation = `Включает ${formatMoney(kartaCashback)} кешбэка и ${formatMoney(graceInterest)} процентов по депозиту за 85 дней без % по карте. Затем сумма продолжит расти.`;
+                let kartaPct = Math.round((kartaCashback / item.val) * 100);
+                explanation = `
+                    <div style="color: #333333; margin-bottom: 8px;">Кешбэк + процент на эту сумму за 85 дней грейс-периода.</div>
+                    <div class="visual-bar-container">
+                        <div class="visual-bar-part" style="width: ${kartaPct}%; background: #0079C2;"></div>
+                        <div class="visual-bar-part" style="width: ${100 - kartaPct}%; background: #12a04b;"></div>
+                    </div>
+                    <div class="visual-legend">
+                        <div><span class="visual-dot" style="background: #0079C2;"></span>Кешбэк: <strong>${formatMoney(kartaCashback)}</strong></div>
+                        <div><span class="visual-dot" style="background: #12a04b;"></span>Проценты (85 дн.): <strong>${formatMoney(graceInterest)}</strong></div>
+                    </div>
+                `;
             } else if (item.id === 'res-inst') {
-                explanation = `Вы заработаете ${formatMoney(instInterest)} процентов на депозите за ${state.installmentMonths} мес.` + (state.installmentBonus > 0 ? ` + ${formatMoney(state.installmentBonus)} по акции.` : '');
+                let instTot = instInterest + state.installmentBonus;
+                let intPct = Math.round((instInterest / instTot) * 100) || 100;
+                let bonusPct = 100 - intPct;
+                explanation = `
+                    <div style="color: #333333; margin-bottom: 8px;">Сумма лежит на депозите, пока вы платите рассрочку.</div>
+                    <div class="visual-bar-container">
+                        <div class="visual-bar-part" style="width: ${intPct}%; background: #12a04b;"></div>
+                        ${state.installmentBonus > 0 ? `<div class="visual-bar-part" style="width: ${bonusPct}%; background: #f14635;"></div>` : ''}
+                    </div>
+                    <div class="visual-legend">
+                        <div><span class="visual-dot" style="background: #12a04b;"></span>Проценты: <strong>${formatMoney(instInterest)}</strong></div>
+                        ${state.installmentBonus > 0 ? `<div><span class="visual-dot" style="background: #f14635;"></span>Бонус: <strong>${formatMoney(state.installmentBonus)}</strong></div>` : ''}
+                    </div>
+                `;
             } else if (item.id === 'res-gold') {
-                explanation = `Вы получите ${formatMoney(state.kaspiGoldBonusAmount)} Kaspi бонусов сразу. (Бонусы нельзя положить на депозит)`;
+                explanation = `
+                    <div style="color: #333333; margin-bottom: 8px;">Бонусы зачисляются сразу, но не растут на депозите.</div>
+                    <div class="visual-bar-container">
+                        <div class="visual-bar-part" style="width: 100%; background: #f14635;"></div>
+                    </div>
+                    <div class="visual-legend">
+                        <div><span class="visual-dot" style="background: #f14635;"></span>Kaspi Бонусы: <strong>${formatMoney(state.kaspiGoldBonusAmount)}</strong></div>
+                    </div>
+                `;
             } else if (item.id === 'res-iron') {
-                explanation = `Вы получите ${formatMoney(ironCashback)} кешбэка деньгами сразу, и они принесут сложный процент на депозите за ${state.installmentMonths} мес.`;
+                let ironTot = item.val;
+                let ironCashPct = Math.round((ironCashback / ironTot) * 100);
+                let ironInt = ironTot - ironCashback;
+                explanation = `
+                    <div style="color: #333333; margin-bottom: 8px;">Кешбэк деньгами сразу кладется на депозит.</div>
+                    <div class="visual-bar-container">
+                        <div class="visual-bar-part" style="width: ${ironCashPct}%; background: #0079C2;"></div>
+                        <div class="visual-bar-part" style="width: ${100 - ironCashPct}%; background: #12a04b;"></div>
+                    </div>
+                    <div class="visual-legend">
+                        <div><span class="visual-dot" style="background: #0079C2;"></span>Кешбэк (4%): <strong>${formatMoney(ironCashback)}</strong></div>
+                        <div><span class="visual-dot" style="background: #12a04b;"></span>Проценты: <strong>${formatMoney(ironInt)}</strong></div>
+                    </div>
+                `;
             }
 
             // Создаем или находим кастомный тултип
@@ -351,18 +403,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Базовые стили (сброс)
             el.style.background = 'transparent';
-            el.style.border = 'none';
-            el.style.padding = '16px 0';
-            el.style.margin = '0';
-            el.style.borderRadius = '0';
+            el.style.boxShadow = 'none';
+            
+            
+            
 
             if (item.val === maxVal && maxVal > 0) {
                 // Подсвечиваем самый выгодный вариант
                 el.style.background = '#fff5f5'; // Светло-красный/розовый фон
-                el.style.border = '1px solid var(--primary)';
+                el.style.boxShadow = 'inset 0 0 0 1px var(--primary)';
                 el.style.borderRadius = '12px';
-                el.style.padding = '8px';
-                el.style.margin = '4px -8px';
+                
+                
 
                 tooltipEl.innerHTML = `
                     ${tooltipSvgIcon}
@@ -547,9 +599,13 @@ window.downloadPDF = function(e, type) {
     
     const container = document.createElement('div');
     container.innerHTML = tableHtml;
-    // html2pdf needs it in the DOM temporarily or it might struggle with fonts/styles.
     container.style.position = 'absolute';
-    container.style.top = '-9999px';
+    container.style.top = '0';
+    container.style.left = '0';
+    container.style.width = '800px';
+    container.style.zIndex = '-100';
+    // Remove absolute top: -9999px because html2canvas ignores off-screen or empty bounds sometimes
+
     document.body.appendChild(container);
     
     const opt = {
