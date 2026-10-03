@@ -189,6 +189,21 @@ function simulateKaspiDeposit(startBalance, startDate, events, annualRate) {
     const priceInput = document.getElementById('item-price');
     const kaspiGoldBonusInput = document.getElementById('kaspi-gold-bonus');
     const kartaPercentChips = document.querySelectorAll('#karta-percent-chips .chip');
+
+    const monthChips = document.querySelectorAll('.month-chips .chip');
+    const depositRadios = document.querySelectorAll('input[name="deposit-type"]');
+    
+    // Выводы
+    const valInst = document.getElementById('val-inst');
+    const valGold = document.getElementById('val-gold');
+    const valIron = document.getElementById('val-iron');
+    const valKarta = document.getElementById('val-karta');
+    const resKarta = document.getElementById('res-karta');
+    const descInst = document.getElementById('desc-inst');
+    const descKarta = document.getElementById('desc-karta');
+    const earlyPayoffBox = document.getElementById('early-payoff-box');
+    const instRecBox = document.getElementById('installment-recommendation');
+
     
     // Рассрочка
     const kaspiPromoToggle = document.getElementById('kaspi-promo-toggle');
@@ -222,7 +237,21 @@ function simulateKaspiDeposit(startBalance, startDate, events, annualRate) {
     }
 
     // Слушатели событий
+
+    const formatInputValue = (e) => {
+        let val = e.target.value.replace(/[^\d]/g, '');
+        if (val) {
+            e.target.value = parseInt(val, 10).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        } else {
+            e.target.value = '';
+        }
+    };
+
+    priceInput.addEventListener('input', formatInputValue);
+    kaspiGoldBonusInput.addEventListener('input', formatInputValue);
+
     priceInput.addEventListener('input', (e) => { state.price = parseNumber(e.target.value); calculate(); });
+
     kaspiGoldBonusInput.addEventListener('input', (e) => { 
         state.kaspiGoldBonusAmount = parseNumber(e.target.value); 
         if (kaspiPromoToggle.checked) state.installmentBonus = state.kaspiGoldBonusAmount;
@@ -653,7 +682,7 @@ function simulateKaspiDeposit(startBalance, startDate, events, annualRate) {
     const dateInput = document.getElementById('delivery-date');
     if(dateInput) {
         dateInput.value = `${String(state.deliveryDate.getDate()).padStart(2, '0')}.${String(state.deliveryDate.getMonth() + 1).padStart(2, '0')}.${state.deliveryDate.getFullYear()}`;
-        dateInput.addEventListener("click", window.openDateModal); dateInput.addEventListener("touchstart", window.openDateModal);
+        dateInput.onclick = window.openDateModal;
     }
 
     calculate();
