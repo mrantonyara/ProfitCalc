@@ -1,3 +1,9 @@
+const formatMoney = (amount) => Math.round(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0") + "\u00A0₸";
+const parseNumber = (val) => {
+    const rawValue = val.replace(/[^\d.]/g, '');
+    return parseFloat(rawValue) || 0;
+};
+
 document.addEventListener('DOMContentLoaded', () => {
 
         const monthNamesRu = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
@@ -69,12 +75,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Состояние калькулятора
 
-    const formatMoney = (amount) => Math.round(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0") + "\u00A0₸";
+    
 
-    const parseNumber = (val) => {
-        const rawValue = val.replace(/[^\d.]/g, '');
-        return parseFloat(rawValue) || 0;
-    };
+
 
     const formattedInputs = document.querySelectorAll('.formatted-input');
     formattedInputs.forEach(input => {
