@@ -6,6 +6,97 @@ const parseNumber = (val) => {
 
 document.addEventListener('DOMContentLoaded', () => {
 
+// --- CUSTOM KASPI CALENDAR LOGIC ---
+let calCurrentDate = new Date();
+let calSelectedDate = new Date();
+const monthNamesTitle = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+
+function renderCalendar() {
+    const year = calCurrentDate.getFullYear();
+    const month = calCurrentDate.getMonth();
+    const el = document.getElementById('cal-month-year');
+    if(el) el.textContent = `${monthNamesTitle[month]} ${year}`;
+    
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    let startDayOfWeek = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+    const totalDays = lastDay.getDate();
+    
+    const grid = document.getElementById('kaspi-calendar-grid');
+    if(!grid) return;
+    grid.innerHTML = '';
+    
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    
+    for (let i = 0; i < startDayOfWeek; i++) {
+        const div = document.createElement('div');
+        div.className = 'cal-day empty';
+        grid.appendChild(div);
+    }
+    
+    for (let d = 1; d <= totalDays; d++) {
+        const cellDate = new Date(year, month, d);
+        const div = document.createElement('div');
+        div.className = 'cal-day';
+        div.textContent = d;
+        
+        if (cellDate.getTime() === calSelectedDate.getTime()) div.classList.add('selected');
+        if (cellDate.getTime() === today.getTime()) div.classList.add('today');
+        
+        div.onclick = () => {
+            calSelectedDate = new Date(year, month, d);
+            renderCalendar();
+        };
+        
+        grid.appendChild(div);
+    }
+}
+
+window.prevMonth = function() { calCurrentDate.setMonth(calCurrentDate.getMonth() - 1); renderCalendar(); };
+window.nextMonth = function() { calCurrentDate.setMonth(calCurrentDate.getMonth() + 1); renderCalendar(); };
+
+window.selectQuickDate = function(addDays) {
+    let d = new Date();
+    d.setHours(0,0,0,0);
+    d.setDate(d.getDate() + addDays);
+    calSelectedDate = new Date(d);
+    calCurrentDate = new Date(d);
+    renderCalendar();
+};
+
+window.openDateModal = function() {
+    calCurrentDate = new Date(calSelectedDate);
+    renderCalendar();
+    const overlay = document.getElementById('kaspi-date-overlay');
+    if(overlay) overlay.classList.add('show');
+};
+
+window.closeDateModal = function() {
+    const overlay = document.getElementById('kaspi-date-overlay');
+    if(overlay) overlay.classList.remove('show');
+};
+
+window.confirmDateModal = function() {
+    state.deliveryDate = new Date(calSelectedDate);
+    const input = document.getElementById('delivery-date');
+    if(input) {
+        input.value = `${String(state.deliveryDate.getDate()).padStart(2, '0')}.${String(state.deliveryDate.getMonth() + 1).padStart(2, '0')}.${state.deliveryDate.getFullYear()}`;
+    }
+    closeDateModal();
+    if(typeof calculate === 'function') calculate();
+};
+
+
+    calSelectedDate.setHours(0,0,0,0);
+    state.deliveryDate = new Date(calSelectedDate);
+    const dateInput = document.getElementById('delivery-date');
+    if(dateInput) {
+        dateInput.value = `${String(state.deliveryDate.getDate()).padStart(2, '0')}.${String(state.deliveryDate.getMonth() + 1).padStart(2, '0')}.${state.deliveryDate.getFullYear()}`;
+        dateInput.onclick = window.openDateModal;
+    }
+
+
         const monthNamesRu = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
     const formatRuDate = (d) => `${d.getDate()} ${monthNamesRu[d.getMonth()]} ${d.getFullYear()} г.`;
     const addMonths = (date, months) => {
@@ -196,12 +287,12 @@ function simulateKaspiDeposit(startBalance, startDate, events, annualRate) {
                 valKarta.textContent = '—';
                 descKarta.textContent = 'Недоступно';
                 valKarta.style.color = '#8e8e93';
-                resKarta.classList.add('disabled-method');
+                resKarta.classList.add('disabled-method'); resKarta.style.display = "none";
             } else {
                 valKarta.textContent = '0\u00A0₸';
                 descKarta.textContent = 'Кешбэк + 85 дней';
                 valKarta.style.color = '#1c1c1e';
-                resKarta.classList.remove('disabled-method');
+                resKarta.classList.remove('disabled-method'); resKarta.style.display = "flex";
             }
             
             // Сброс стилей лучших вариантов
@@ -284,7 +375,7 @@ function simulateKaspiDeposit(startBalance, startDate, events, annualRate) {
             valKarta.textContent = '—';
             descKarta.textContent = 'Недоступно';
             valKarta.style.color = '#8e8e93';
-            resKarta.classList.add('disabled-method');
+            resKarta.classList.add('disabled-method'); resKarta.style.display = "none";
         } else {
             kartaCashback = state.price * (state.customCashbackRate / 100);
             if (kartaCashback > 20000) kartaCashback = 20000;
@@ -317,7 +408,7 @@ function simulateKaspiDeposit(startBalance, startDate, events, annualRate) {
             valKarta.textContent = formatMoney(kartaBenefit);
             descKarta.textContent = kartaCashback >= 20000 ? `Лимит 20 000 ₸ + ${formatMoney(graceInterest)} %` : `Кешбэк + ${formatMoney(graceInterest)} %`;
             valKarta.style.color = '';
-            resKarta.classList.remove('disabled-method');
+            resKarta.classList.remove('disabled-method'); resKarta.style.display = "flex";
         }
 
         valIron.textContent = formatMoney(ironBenefit);
