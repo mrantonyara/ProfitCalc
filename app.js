@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
             earnedInterest += int;
             depositBalance -= pmt;
             
-            window.schedules.inst.push({ date: formatRuDate(addMonths(delivery, m)), balance: formatMoney(Math.max(0, depositBalance)), interest: `+${formatMoney(int)}`, payment: formatMoney(pmt) });
+            window.schedules.inst.push({ date: formatRuDate(addMonths(delivery, m)), balance: formatMoney(Math.max(0, depositBalance)), interest: `+${formatMoney(int)}`, payment: formatMoney(pmt), rawInterest: int, rawPayment: pmt });
             interestHistory.push(earnedInterest);
         }
         
@@ -642,7 +642,13 @@ window.confirmPdfDownload = function() {
         headers.map(h => ({ text: h, style: 'tableHeader' }))
     ];
     
+    let totalInterest = 0;
+    let totalPayment = 0;
+
     schedule.forEach(row => {
+        totalInterest += row.rawInterest || 0;
+        totalPayment += row.rawPayment || 0;
+        
         let rowData = [];
         if (type === 'inst') {
             rowData = [
@@ -665,6 +671,28 @@ window.confirmPdfDownload = function() {
         }
         tableBody.push(rowData);
     });
+
+    // Add Total Row
+    if (type === 'inst') {
+        tableBody.push([
+            { text: 'Итого', bold: true },
+            '',
+            { text: '+' + formatMoney(totalInterest).replace(/₸/g, 'тг.'), color: '#0079C2', bold: true },
+            { text: formatMoney(totalPayment).replace(/₸/g, 'тг.'), color: '#f14635', bold: true }
+        ]);
+    } else if (type === 'gold') {
+        tableBody.push([
+            { text: 'Итого', bold: true },
+            { text: '+' + formatMoney(totalInterest).replace(/₸/g, 'тг.'), color: '#0079C2', bold: true }
+        ]);
+    } else {
+        tableBody.push([
+            { text: 'Итого', bold: true },
+            '',
+            { text: '+' + formatMoney(totalInterest).replace(/₸/g, 'тг.'), color: '#0079C2', bold: true }
+        ]);
+    }
+
 
     const docDefinition = {
         pageSize: 'A4',

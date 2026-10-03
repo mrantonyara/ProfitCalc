@@ -572,10 +572,10 @@ body.tooltip-active #tooltip-overlay {
 }
 .modal-btn-cancel:active { background: #e5e5ea; }
 .modal-btn-primary {
-    background: #0079C2;
+    background: #f14635;
     color: #fff;
 }
-.modal-btn-primary:active { background: #00609b; }
+.modal-btn-primary:active { background: #d03a2b; }
 
 /* Flatpickr Premium Kaspi Theme */
 .flatpickr-calendar {
