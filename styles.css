@@ -438,7 +438,7 @@ body.tooltip-active #tooltip-overlay {
     position: relative;
     margin-bottom: 16px;
 }
-.date-picker-wrapper input[type="date"] {
+.date-picker-wrapper input {
     width: 100%;
     padding: 16px 48px 16px 16px;
     font-size: 16px;
@@ -454,7 +454,7 @@ body.tooltip-active #tooltip-overlay {
     cursor: pointer;
     transition: all 0.2s ease;
 }
-.date-picker-wrapper input[type="date"]:focus {
+.date-picker-wrapper input:focus {
     border-color: var(--primary);
     background-color: #fff;
     box-shadow: 0 0 0 3px rgba(0, 121, 194, 0.1);
@@ -467,7 +467,7 @@ body.tooltip-active #tooltip-overlay {
     pointer-events: none;
     color: var(--primary);
 }
-.date-picker-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
+.date-picker-wrapper input::-webkit-calendar-picker-indicator {
     background: transparent;
     bottom: 0;
     color: transparent;
