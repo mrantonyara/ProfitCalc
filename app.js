@@ -36,66 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Рассрочка
     const kaspiPromoToggle = document.getElementById('kaspi-promo-toggle');
     const deliveryDateInput = document.getElementById('delivery-date');
-    if (deliveryDateInput) {
-        flatpickr(deliveryDateInput, {
-            locale: "ru",
-            defaultDate: new Date(),
-            dateFormat: "d.m.Y",
-            disableMobile: true, // Use flatpickr even on mobile for consistency
-            onChange: function(selectedDates) {
-                if (selectedDates.length > 0) {
-                    state.deliveryDate = selectedDates[0];
-                    calculate();
-                }
-            }
-        });
-        state.deliveryDate = new Date();
-    }
-
-    const installmentBonusContainer = document.getElementById('installment-bonus-container');
-    const installmentBonusInput = document.getElementById('installment-bonus');
-    const monthChips = document.querySelectorAll('#installment-months .chip');
-    const depositRadios = document.querySelectorAll('input[name="deposit-type"]');
-    
-    // Итоги (DOM элементы)
-    const valKarta = document.getElementById('val-karta');
-    const valInst = document.getElementById('val-inst');
-    const valGold = document.getElementById('val-gold');
-    const valIron = document.getElementById('val-iron');
-    
-    const descKarta = document.getElementById('desc-karta');
-    const descInst = document.getElementById('desc-inst');
-    const resKarta = document.getElementById('res-karta');
-
-    
-    const earlyPayoffBox = document.getElementById('early-payoff-box');
-    const payoffMonth = document.getElementById('payoff-month');
-
-    const instRecBox = document.getElementById('installment-recommendation');
-
-    // Состояние калькулятора
-
-    
-
-
-
-    const formattedInputs = document.querySelectorAll('.formatted-input');
-    formattedInputs.forEach(input => {
-        // Запрет ввода всего, кроме цифр
-        input.addEventListener('keypress', (e) => {
-            if (!/[0-9]/.test(e.key)) {
-                e.preventDefault();
-            }
-        });
-
-        input.addEventListener('input', (e) => {
-            let val = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/g, '');
-            if (val !== '') {
-                val = val.replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0");
-            }
-            e.target.value = val;
-        });
-    });
 
     // Слушатели событий
     priceInput.addEventListener('input', (e) => { state.price = parseNumber(e.target.value); calculate(); });
