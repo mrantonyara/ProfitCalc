@@ -597,26 +597,14 @@ window.downloadPDF = function(e, type) {
     
     tableHtml += `</tbody></table></div>`;
     
-    const container = document.createElement('div');
-    container.innerHTML = tableHtml;
-    container.style.position = 'absolute';
-    container.style.top = '0';
-    container.style.left = '0';
-    container.style.width = '800px';
-    container.style.zIndex = '-100';
-    // Remove absolute top: -9999px because html2canvas ignores off-screen or empty bounds sometimes
-
-    document.body.appendChild(container);
-    
     const opt = {
       margin:       10,
       filename:     `schedule_${type}.pdf`,
       image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2 },
+      html2canvas:  { scale: 2, backgroundColor: '#ffffff' },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
     
-    html2pdf().set(opt).from(container).save().then(() => {
-        document.body.removeChild(container);
-    });
+    // We pass tableHtml string directly. html2pdf safely creates an iframe to render it.
+    html2pdf().set(opt).from(tableHtml).save();
 };
