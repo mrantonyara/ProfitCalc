@@ -569,89 +569,75 @@ window.downloadPDF = function(e, type) {
     if (type === 'iron') title = "График дохода: BCC ironCard";
     if (type === 'karta') title = "График дохода: BCC #картакарта";
 
-    let tableHtml = `
-    <div id="pdf-content" style="padding: 30px; font-family: sans-serif; color: #1c1c1e;">
-        <h2 style="color: #f14635; margin-bottom: 20px; text-align: center;">${title}</h2>
-        <table style="width: 100%; border-collapse: collapse; text-align: right; font-size: 14px;">
-            <thead>
-                <tr style="border-bottom: 2px solid #ccc;">
-                    <th style="padding: 10px; text-align: left;">Период</th>
-                    <th style="padding: 10px;">Остаток депозита</th>
-                    <th style="padding: 10px;">Начисленные %</th>
-                    <th style="padding: 10px;">Платеж банку</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
+    // Build table body for pdfmake
+    // First row is the header
+    const tableBody = [
+        [
+            { text: 'Период', style: 'tableHeader' },
+            { text: 'Остаток депозита', style: 'tableHeader' },
+            { text: 'Начисленные %', style: 'tableHeader' },
+            { text: 'Платеж банку', style: 'tableHeader' }
+        ]
+    ];
     
     schedule.forEach(row => {
-        tableHtml += `
-            <tr style="border-bottom: 1px solid #eee;">
-                <td style="padding: 10px; text-align: left;">${row.date}</td>
-                <td style="padding: 10px;">${row.balance}</td>
-                <td style="padding: 10px; color: #0079C2;">${row.interest}</td>
-                <td style="padding: 10px; color: #f14635;">${row.payment}</td>
-            </tr>
-        `;
+        tableBody.push([
+            row.date,
+            row.balance,
+            { text: row.interest, color: '#0079C2' },
+            { text: row.payment, color: '#f14635' }
+        ]);
     });
-    
-    tableHtml += `</tbody></table></div>`;
-    
-    const loadingOverlay = document.createElement('div');
-    loadingOverlay.style.position = 'fixed';
-    loadingOverlay.style.top = '0';
-    loadingOverlay.style.left = '0';
-    loadingOverlay.style.width = '100vw';
-    loadingOverlay.style.height = '100vh';
-    loadingOverlay.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
-    loadingOverlay.style.zIndex = '9999';
-    loadingOverlay.style.display = 'flex';
-    loadingOverlay.style.alignItems = 'center';
-    loadingOverlay.style.justifyContent = 'center';
-    loadingOverlay.style.fontFamily = 'sans-serif';
-    loadingOverlay.style.fontSize = '18px';
-    loadingOverlay.style.fontWeight = 'bold';
-    loadingOverlay.style.color = '#0079C2';
-    loadingOverlay.innerHTML = 'Формируем PDF...';
-    
-    const container = document.createElement('div');
-    container.innerHTML = tableHtml;
-    container.style.width = '800px';
-    container.style.backgroundColor = '#ffffff';
-    container.style.padding = '20px';
-    
-    const appContainer = document.querySelector('.app-container');
-    
-    document.body.appendChild(loadingOverlay);
-    
-    // Hide the app, put container in normal flow to guarantee rendering dimensions
-    appContainer.style.display = 'none';
-    document.body.appendChild(container);
-    
-    const originalScroll = window.scrollY;
-    window.scrollTo(0, 0);
 
-    const opt = {
-      margin:       10,
-      filename:     `schedule_${type}.pdf`,
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, scrollY: 0, windowWidth: 800 },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    const docDefinition = {
+        pageSize: 'A4',
+        pageOrientation: 'portrait',
+        pageMargins: [ 40, 60, 40, 60 ],
+        content: [
+            { text: title, style: 'header' },
+            {
+                table: {
+                    headerRows: 1,
+                    widths: [ '*', 'auto', 'auto', 'auto' ],
+                    body: tableBody
+                },
+                layout: {
+                    hLineWidth: function (i, node) {
+                        return (i === 0 || i === node.table.body.length) ? 0 : 1;
+                    },
+                    vLineWidth: function (i, node) {
+                        return 0;
+                    },
+                    hLineColor: function (i, node) {
+                        return '#eeeeee';
+                    },
+                    paddingLeft: function(i, node) { return 10; },
+                    paddingRight: function(i, node) { return 10; },
+                    paddingTop: function(i, node) { return 8; },
+                    paddingBottom: function(i, node) { return 8; },
+                }
+            }
+        ],
+        styles: {
+            header: {
+                fontSize: 18,
+                bold: true,
+                color: '#f14635',
+                alignment: 'center',
+                margin: [0, 0, 0, 20]
+            },
+            tableHeader: {
+                bold: true,
+                fontSize: 12,
+                color: '#1c1c1e',
+                fillColor: '#f5f6f8'
+            }
+        },
+        defaultStyle: {
+            fontSize: 11,
+            color: '#1c1c1e'
+        }
     };
-    
-    // Wait for the browser to perform a layout pass so the container has actual dimensions!
-    setTimeout(() => {
-        html2pdf().set(opt).from(container).save().then(() => {
-            document.body.removeChild(container);
-            appContainer.style.display = '';
-            document.body.removeChild(loadingOverlay);
-            window.scrollTo(0, originalScroll);
-        }).catch(err => {
-            console.error('PDF generation error:', err);
-            document.body.removeChild(container);
-            appContainer.style.display = '';
-            document.body.removeChild(loadingOverlay);
-            window.scrollTo(0, originalScroll);
-        });
-    }, 150);
+
+    pdfMake.createPdf(docDefinition).download(`schedule_${type}.pdf`);
 };
