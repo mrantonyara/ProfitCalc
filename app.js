@@ -1,5 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+        const monthNamesRu = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+    const formatRuDate = (d) => `${d.getDate()} ${monthNamesRu[d.getMonth()]} ${d.getFullYear()} г.`;
+    const addMonths = (date, months) => {
+        let d = new Date(date);
+        let expectedMonth = (d.getMonth() + months) % 12;
+        d.setMonth(d.getMonth() + months);
+        if (d.getMonth() !== expectedMonth && d.getDate() < 4) {
+            d.setDate(0);
+        }
+        return d;
+    };
+
     let state = {
         price: 0,
         kaspiGoldBonusAmount: 0, 
@@ -208,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
         earnedInterest += delayInt;
         
         if (diffDays > 0) {
-            window.schedules.inst.push({ date: `Ожидание (${diffDays} дн.)`, balance: formatMoney(depositBalance), interest: `+${formatMoney(delayInt)}`, payment: "0\u00A0₸" });
+            window.schedules.inst.push({ date: `Ожидание до ${formatRuDate(delivery)}`, balance: formatMoney(depositBalance), interest: `+${formatMoney(delayInt)}`, payment: "0\u00A0₸" });
         }
 
         for (let m = 1; m <= state.installmentMonths; m++) {
@@ -217,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
             earnedInterest += int;
             depositBalance -= pmt;
             
-            window.schedules.inst.push({ date: `Месяц ${m}`, balance: formatMoney(Math.max(0, depositBalance)), interest: `+${formatMoney(int)}`, payment: formatMoney(pmt) });
+            window.schedules.inst.push({ date: formatRuDate(addMonths(delivery, m)), balance: formatMoney(Math.max(0, depositBalance)), interest: `+${formatMoney(int)}`, payment: formatMoney(pmt) });
             interestHistory.push(earnedInterest);
         }
         
@@ -226,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 2. Kaspi Gold
         let goldBenefit = state.kaspiGoldBonusAmount;
-        window.schedules.gold.push({ date: "Сразу", balance: "0\u00A0₸", interest: `+${formatMoney(goldBenefit)}`, payment: "0\u00A0₸" });
+        window.schedules.gold.push({ date: formatRuDate(today), balance: "0\u00A0₸", interest: `+${formatMoney(goldBenefit)}`, payment: "0\u00A0₸" });
 
         // 3. BCC ironCard
         let ironCashback = state.price * 0.04;
@@ -236,13 +248,13 @@ document.addEventListener('DOMContentLoaded', () => {
         ironBalance += ironDelayInt;
         
         if (diffDays > 0) {
-            window.schedules.iron.push({ date: `Ожидание (${diffDays} дн.)`, balance: formatMoney(ironBalance), interest: `+${formatMoney(ironDelayInt)}`, payment: "0\u00A0₸" });
+            window.schedules.iron.push({ date: `Ожидание до ${formatRuDate(delivery)}`, balance: formatMoney(ironBalance), interest: `+${formatMoney(ironDelayInt)}`, payment: "0\u00A0₸" });
         }
 
         for (let m = 1; m <= state.installmentMonths; m++) {
             let int = ironBalance * monthlyRate;
             ironBalance += int;
-            window.schedules.iron.push({ date: `Месяц ${m}`, balance: formatMoney(ironBalance), interest: `+${formatMoney(int)}`, payment: "0\u00A0₸" });
+            window.schedules.iron.push({ date: formatRuDate(addMonths(delivery, m)), balance: formatMoney(ironBalance), interest: `+${formatMoney(int)}`, payment: "0\u00A0₸" });
         }
         let ironBenefit = ironBalance;
 
@@ -267,14 +279,14 @@ document.addEventListener('DOMContentLoaded', () => {
             let kartaBalance = baseKarta;
             let remainingMonths = state.installmentMonths - (85 / 30.416);
             
-            window.schedules.karta.push({ date: "Грейс (85 дн.)", balance: formatMoney(kartaBalance), interest: `+${formatMoney(graceInterest)}`, payment: "0\u00A0₸" });
+            window.schedules.karta.push({ date: `Грейс до ${formatRuDate(new Date(today.getTime() + 85 * 24 * 60 * 60 * 1000))}`, balance: formatMoney(kartaBalance), interest: `+${formatMoney(graceInterest)}`, payment: "0\u00A0₸" });
             
             if (remainingMonths > 0) {
                 let remainingFullMonths = Math.floor(remainingMonths);
                 for(let m=1; m<=remainingFullMonths; m++) {
                     let int = kartaBalance * monthlyRate;
                     kartaBalance += int;
-                    window.schedules.karta.push({ date: `След. месяц ${m}`, balance: formatMoney(kartaBalance), interest: `+${formatMoney(int)}`, payment: "0\u00A0₸" });
+                    window.schedules.karta.push({ date: formatRuDate(addMonths(new Date(today.getTime() + 85 * 24 * 60 * 60 * 1000), m)), balance: formatMoney(kartaBalance), interest: `+${formatMoney(int)}`, payment: "0\u00A0₸" });
                 }
                 let fraction = remainingMonths - remainingFullMonths;
                 if (fraction > 0) {
@@ -554,6 +566,10 @@ const closeTooltips = (e) => {
 document.addEventListener('click', closeTooltips);
 document.addEventListener('touchstart', closeTooltips, {passive: true});
 
+
+let currentDownloadType = null;
+let currentDownloadTitle = null;
+
 window.downloadPDF = function(e, type) {
     if (e) {
         e.preventDefault();
@@ -563,14 +579,51 @@ window.downloadPDF = function(e, type) {
     const schedule = window.schedules && window.schedules[type];
     if (!schedule || schedule.length === 0) return;
     
+    currentDownloadType = type;
+    
     let title = "График";
     if (type === 'inst') title = "График платежей по рассрочке";
     if (type === 'gold') title = "Kaspi Gold (бонусы)";
     if (type === 'iron') title = "График дохода: BCC ironCard";
     if (type === 'karta') title = "График дохода: BCC #картакарта";
+    
+    currentDownloadTitle = title;
+    
+    document.getElementById('pdf-filename-input').value = '';
+    document.getElementById('pdf-modal-overlay').classList.add('show');
+};
 
-    // Build table body for pdfmake
-    // First row is the header
+window.closePdfModal = function() {
+    document.getElementById('pdf-modal-overlay').classList.remove('show');
+    currentDownloadType = null;
+};
+
+window.confirmPdfDownload = function() {
+    if (!currentDownloadType) return;
+    
+    let fileName = document.getElementById('pdf-filename-input').value.trim();
+    
+    if (fileName === '') {
+        // Generate DDMMYY-HHMM
+        const d = new Date();
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yy = String(d.getFullYear()).slice(-2);
+        const hh = String(d.getHours()).padStart(2, '0');
+        const mn = String(d.getMinutes()).padStart(2, '0');
+        fileName = `${dd}${mm}${yy}-${hh}${mn}`;
+    }
+    
+    if (!fileName.toLowerCase().endsWith('.pdf')) {
+        fileName += '.pdf';
+    }
+    
+    const type = currentDownloadType;
+    const schedule = window.schedules[type];
+    const title = currentDownloadTitle;
+    
+    closePdfModal();
+
     const tableBody = [
         [
             { text: 'Период', style: 'tableHeader' },
@@ -639,16 +692,6 @@ window.downloadPDF = function(e, type) {
             color: '#1c1c1e'
         }
     };
-
-        let fileName = prompt("Введите название для PDF (например: Холодильник), или просто нажмите ОК:", title);
-    if (fileName === null) return; // User cancelled
-    
-    fileName = fileName.trim();
-    if (fileName === '') fileName = title;
-    
-    if (!fileName.toLowerCase().endsWith('.pdf')) {
-        fileName += '.pdf';
-    }
 
     pdfMake.createPdf(docDefinition).download(fileName);
 };

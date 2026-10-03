@@ -220,5 +220,19 @@
         </main>
     </div>
     <script src="app.js"></script>
+
+    <!-- Modal for PDF Download -->
+    <div id="pdf-modal-overlay" class="modal-overlay">
+        <div class="modal-card">
+            <h3 style="margin-bottom: 12px; color: #1c1c1e;">Скачать график</h3>
+            <p style="font-size: 14px; color: #8e8e93; margin-bottom: 16px;">Укажите название файла, чтобы не потерять его (необязательно).</p>
+            <input type="text" id="pdf-filename-input" class="input-field" placeholder="Например: Холодильник" style="margin-bottom: 20px;">
+            <div style="display: flex; gap: 12px;">
+                <button class="modal-btn modal-btn-cancel" onclick="closePdfModal()">Отмена</button>
+                <button class="modal-btn modal-btn-primary" onclick="confirmPdfDownload()">Скачать PDF</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
