@@ -190,7 +190,7 @@ function simulateKaspiDeposit(startBalance, startDate, events, annualRate) {
     const kaspiGoldBonusInput = document.getElementById('kaspi-gold-bonus');
     const kartaPercentChips = document.querySelectorAll('#karta-percent-chips .chip');
 
-    const monthChips = document.querySelectorAll('.month-chips .chip');
+    const monthChips = document.querySelectorAll('#installment-months .chip');
     const depositRadios = document.querySelectorAll('input[name="deposit-type"]');
     
     // Выводы

@@ -110,7 +110,7 @@ body {
 .list-item {
     display: flex;
     align-items: center;
-    padding: 22px 12px;
+    padding: 16px 12px;
     margin: 0 -12px;
     border-bottom: 1px solid var(--border-color);
     border-radius: 12px;
