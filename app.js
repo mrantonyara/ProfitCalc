@@ -314,8 +314,8 @@ function simulateKaspiDeposit(startBalance, startDate, events, annualRate) {
             // Fallback for aggressively cached mobile browsers
             if (!pmtEl) {
                 chip.innerHTML = `
-                    <div style="font-size: 16px;">${m} мес</div>
-                    <div class="chip-pmt" style="font-size: 11px; font-weight: 400; margin-top: 4px; opacity: 0.9;"></div>
+                    <div style="font-size: 16px;">${m} мес</span>
+                    <div class="chip-pmt" style="font-size: 11px; font-weight: 400; margin-top: 4px; opacity: 0.9;"></span>
                 `;
                 pmtEl = chip.querySelector('.chip-pmt');
             }
@@ -465,7 +465,10 @@ function simulateKaspiDeposit(startBalance, startDate, events, annualRate) {
         valGold.textContent = formatMoney(goldBenefit);
         valInst.textContent = formatMoney(instBenefit);
 
-        descInst.textContent = state.installmentBonus > 0 ? `Проценты + ${formatMoney(state.installmentBonus)} бонус` : `Доход по депозиту`;
+                let bonusText = state.installmentBonus > 0 ? `Проценты + ${formatMoney(state.installmentBonus)} бонус` : `Доход по депозиту`;
+        let instPmt = state.price > 0 ? Math.round(state.price / state.installmentMonths) : 0;
+        let pmtText = `Платёж: ${formatMoney(instPmt)}/мес`;
+        descInst.innerHTML = `${bonusText} <span style="display:block; color:#8e8e93; font-size:12px; margin-top:4px;">${pmtText}</span>`;
 
         // Определяем победителя
         const benefits = [
@@ -498,55 +501,55 @@ function simulateKaspiDeposit(startBalance, startDate, events, annualRate) {
             if (item.id === 'res-karta') {
                 let kartaPct = Math.round((kartaCashback / item.val) * 100);
                 explanation = `
-                    <div style="color: #333333; margin-bottom: 8px;">Кешбэк + процент на эту сумму за 85 дней грейс-периода.</div>
+                    <div style="color: #333333; margin-bottom: 8px;">Кешбэк + процент на эту сумму за 85 дней грейс-периода.</span>
                     <div class="visual-bar-container">
-                        <div class="visual-bar-part" style="width: ${kartaPct}%; background: #0079C2;"></div>
-                        <div class="visual-bar-part" style="width: ${100 - kartaPct}%; background: #12a04b;"></div>
-                    </div>
+                        <div class="visual-bar-part" style="width: ${kartaPct}%; background: #0079C2;"></span>
+                        <div class="visual-bar-part" style="width: ${100 - kartaPct}%; background: #12a04b;"></span>
+                    </span>
                     <div class="visual-legend">
-                        <div><span class="visual-dot" style="background: #0079C2;"></span>Кешбэк: <strong>${formatMoney(kartaCashback)}</strong></div>
-                        <div><span class="visual-dot" style="background: #12a04b;"></span>Проценты (85 дн.): <strong>${formatMoney(graceInterest)}</strong></div>
-                    </div>
+                        <div><span class="visual-dot" style="background: #0079C2;"></span>Кешбэк: <strong>${formatMoney(kartaCashback)}</strong></span>
+                        <div><span class="visual-dot" style="background: #12a04b;"></span>Проценты (85 дн.): <strong>${formatMoney(graceInterest)}</strong></span>
+                    </span>
                 `;
             } else if (item.id === 'res-inst') {
                 let instTot = instInterest + state.installmentBonus;
                 let intPct = Math.round((instInterest / instTot) * 100) || 100;
                 let bonusPct = 100 - intPct;
                 explanation = `
-                    <div style="color: #333333; margin-bottom: 8px;">Сумма лежит на депозите, пока вы платите рассрочку.</div>
+                    <div style="color: #333333; margin-bottom: 8px;">Сумма лежит на депозите, пока вы платите рассрочку.</span>
                     <div class="visual-bar-container">
-                        <div class="visual-bar-part" style="width: ${intPct}%; background: #12a04b;"></div>
-                        ${state.installmentBonus > 0 ? `<div class="visual-bar-part" style="width: ${bonusPct}%; background: #f14635;"></div>` : ''}
-                    </div>
+                        <div class="visual-bar-part" style="width: ${intPct}%; background: #12a04b;"></span>
+                        ${state.installmentBonus > 0 ? `<div class="visual-bar-part" style="width: ${bonusPct}%; background: #f14635;"></span>` : ''}
+                    </span>
                     <div class="visual-legend">
-                        <div><span class="visual-dot" style="background: #12a04b;"></span>Проценты: <strong>${formatMoney(instInterest)}</strong></div>
-                        ${state.installmentBonus > 0 ? `<div><span class="visual-dot" style="background: #f14635;"></span>Бонус: <strong>${formatMoney(state.installmentBonus)}</strong></div>` : ''}
-                    </div>
+                        <div><span class="visual-dot" style="background: #12a04b;"></span>Проценты: <strong>${formatMoney(instInterest)}</strong></span>
+                        ${state.installmentBonus > 0 ? `<div><span class="visual-dot" style="background: #f14635;"></span>Бонус: <strong>${formatMoney(state.installmentBonus)}</strong></span>` : ''}
+                    </span>
                 `;
             } else if (item.id === 'res-gold') {
                 explanation = `
-                    <div style="color: #333333; margin-bottom: 8px;">Бонусы зачисляются сразу, но не растут на депозите.</div>
+                    <div style="color: #333333; margin-bottom: 8px;">Бонусы зачисляются сразу, но не растут на депозите.</span>
                     <div class="visual-bar-container">
-                        <div class="visual-bar-part" style="width: 100%; background: #f14635;"></div>
-                    </div>
+                        <div class="visual-bar-part" style="width: 100%; background: #f14635;"></span>
+                    </span>
                     <div class="visual-legend">
-                        <div><span class="visual-dot" style="background: #f14635;"></span>Kaspi Бонусы: <strong>${formatMoney(state.kaspiGoldBonusAmount)}</strong></div>
-                    </div>
+                        <div><span class="visual-dot" style="background: #f14635;"></span>Kaspi Бонусы: <strong>${formatMoney(state.kaspiGoldBonusAmount)}</strong></span>
+                    </span>
                 `;
             } else if (item.id === 'res-iron') {
                 let ironTot = item.val;
                 let ironCashPct = Math.round((ironCashback / ironTot) * 100);
                 let ironInt = ironTot - ironCashback;
                 explanation = `
-                    <div style="color: #333333; margin-bottom: 8px;">Кешбэк деньгами сразу кладется на депозит.</div>
+                    <div style="color: #333333; margin-bottom: 8px;">Кешбэк деньгами сразу кладется на депозит.</span>
                     <div class="visual-bar-container">
-                        <div class="visual-bar-part" style="width: ${ironCashPct}%; background: #0079C2;"></div>
-                        <div class="visual-bar-part" style="width: ${100 - ironCashPct}%; background: #12a04b;"></div>
-                    </div>
+                        <div class="visual-bar-part" style="width: ${ironCashPct}%; background: #0079C2;"></span>
+                        <div class="visual-bar-part" style="width: ${100 - ironCashPct}%; background: #12a04b;"></span>
+                    </span>
                     <div class="visual-legend">
-                        <div><span class="visual-dot" style="background: #0079C2;"></span>Кешбэк (4%): <strong>${formatMoney(ironCashback)}</strong></div>
-                        <div><span class="visual-dot" style="background: #12a04b;"></span>Проценты: <strong>${formatMoney(ironInt)}</strong></div>
-                    </div>
+                        <div><span class="visual-dot" style="background: #0079C2;"></span>Кешбэк (4%): <strong>${formatMoney(ironCashback)}</strong></span>
+                        <div><span class="visual-dot" style="background: #12a04b;"></span>Проценты: <strong>${formatMoney(ironInt)}</strong></span>
+                    </span>
                 `;
             }
 
@@ -587,25 +590,25 @@ function simulateKaspiDeposit(startBalance, startDate, events, annualRate) {
                 tooltipEl.innerHTML = `
                     ${tooltipSvgIcon}
                     <div class="info-text">
-                        <div style="font-weight: 700; margin-bottom: 4px; color: #1c1c1e;">Самый выгодный вариант</div>
-                        <div style="color: #333333; margin-bottom: 6px;">${explanation}</div>
-                        <div style="font-weight: 700; color: #1c1c1e;">Итого: <span style="color: #12a04b;">${formatMoney(item.val)}</span></div>
-                    </div>
+                        <div style="font-weight: 700; margin-bottom: 4px; color: #1c1c1e;">Самый выгодный вариант</span>
+                        <div style="color: #333333; margin-bottom: 6px;">${explanation}</span>
+                        <div style="font-weight: 700; color: #1c1c1e;">Итого: <span style="color: #12a04b;">${formatMoney(item.val)}</span></span>
+                    </span>
                 `;
             } else if (item.val === -1) {
                 tooltipEl.innerHTML = `
                     ${tooltipSvgIcon}
-                    <div class="info-text" style="color: #333333;">Этот способ оплаты недоступен (выбран 0%).</div>
+                    <div class="info-text" style="color: #333333;">Этот способ оплаты недоступен (выбран 0%).</span>
                 `;
             } else if (maxVal > 0) {
                 const diff = maxVal - item.val;
                 tooltipEl.innerHTML = `
                     ${tooltipSvgIcon}
                     <div class="info-text">
-                        <div style="font-weight: 700; margin-bottom: 4px; color: #1c1c1e;">Уступает на ${formatMoney(diff)}</div>
-                        <div style="color: #333333; margin-bottom: 6px;">${explanation}</div>
-                        <div style="font-weight: 700; color: #1c1c1e;">Итого: <span style="color: #12a04b;">${formatMoney(item.val)}</span></div>
-                    </div>
+                        <div style="font-weight: 700; margin-bottom: 4px; color: #1c1c1e;">Уступает на ${formatMoney(diff)}</span>
+                        <div style="color: #333333; margin-bottom: 6px;">${explanation}</span>
+                        <div style="font-weight: 700; color: #1c1c1e;">Итого: <span style="color: #12a04b;">${formatMoney(item.val)}</span></span>
+                    </span>
                 `;
             } else {
                     tooltipEl.innerHTML = '';
