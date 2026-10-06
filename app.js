@@ -465,10 +465,7 @@ function simulateKaspiDeposit(startBalance, startDate, events, annualRate) {
         valGold.textContent = formatMoney(goldBenefit);
         valInst.textContent = formatMoney(instBenefit);
 
-                let bonusText = state.installmentBonus > 0 ? `Проценты + ${formatMoney(state.installmentBonus)} бонус` : `Доход по депозиту`;
-        let instPmt = state.price > 0 ? Math.round(state.price / state.installmentMonths) : 0;
-        let pmtText = `Платёж: ${formatMoney(instPmt)}/мес`;
-        descInst.innerHTML = `${bonusText} <span style="display:block; color:#8e8e93; font-size:12px; margin-top:4px;">${pmtText}</span>`;
+                descInst.textContent = state.installmentBonus > 0 ? `Проценты + ${formatMoney(state.installmentBonus)} бонус` : `Доход по депозиту`;
 
         // Определяем победителя
         const benefits = [
