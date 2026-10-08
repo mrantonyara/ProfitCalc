@@ -498,55 +498,55 @@ function simulateKaspiDeposit(startBalance, startDate, events, annualRate) {
             if (item.id === 'res-karta') {
                 let kartaPct = Math.round((kartaCashback / item.val) * 100);
                 explanation = `
-                    <div style="color: #333333; margin-bottom: 8px;">Кешбэк + процент на эту сумму за 85 дней грейс-периода.</span>
+                    <div style="color: #333333; margin-bottom: 8px;">Кешбэк + процент на эту сумму за 85 дней грейс-периода.</div>
                     <div class="visual-bar-container">
-                        <div class="visual-bar-part" style="width: ${kartaPct}%; background: #0079C2;"></span>
-                        <div class="visual-bar-part" style="width: ${100 - kartaPct}%; background: #12a04b;"></span>
-                    </span>
+                        <div class="visual-bar-part" style="width: ${kartaPct}%; background: #0079C2;"></div>
+                        <div class="visual-bar-part" style="width: ${100 - kartaPct}%; background: #12a04b;"></div>
+                    </div>
                     <div class="visual-legend">
-                        <div><span class="visual-dot" style="background: #0079C2;"></span>Кешбэк: <strong>${formatMoney(kartaCashback)}</strong></span>
-                        <div><span class="visual-dot" style="background: #12a04b;"></span>Проценты (85 дн.): <strong>${formatMoney(graceInterest)}</strong></span>
-                    </span>
+                        <div><span class="visual-dot" style="background: #0079C2;"></span>Кешбэк: <strong>${formatMoney(kartaCashback)}</strong></div>
+                        <div><span class="visual-dot" style="background: #12a04b;"></span>Проценты (85 дн.): <strong>${formatMoney(graceInterest)}</strong></div>
+                    </div>
                 `;
             } else if (item.id === 'res-inst') {
                 let instTot = instInterest + state.installmentBonus;
                 let intPct = Math.round((instInterest / instTot) * 100) || 100;
                 let bonusPct = 100 - intPct;
                 explanation = `
-                    <div style="color: #333333; margin-bottom: 8px;">Сумма лежит на депозите, пока вы платите рассрочку.</span>
+                    <div style="color: #333333; margin-bottom: 8px;">Сумма лежит на депозите, пока вы платите рассрочку.</div>
                     <div class="visual-bar-container">
-                        <div class="visual-bar-part" style="width: ${intPct}%; background: #12a04b;"></span>
-                        ${state.installmentBonus > 0 ? `<div class="visual-bar-part" style="width: ${bonusPct}%; background: #f14635;"></span>` : ''}
-                    </span>
+                        <div class="visual-bar-part" style="width: ${intPct}%; background: #12a04b;"></div>
+                        ${state.installmentBonus > 0 ? `<div class="visual-bar-part" style="width: ${bonusPct}%; background: #f14635;"></div>` : ''}
+                    </div>
                     <div class="visual-legend">
-                        <div><span class="visual-dot" style="background: #12a04b;"></span>Проценты: <strong>${formatMoney(instInterest)}</strong></span>
-                        ${state.installmentBonus > 0 ? `<div><span class="visual-dot" style="background: #f14635;"></span>Бонус: <strong>${formatMoney(state.installmentBonus)}</strong></span>` : ''}
-                    </span>
+                        <div><span class="visual-dot" style="background: #12a04b;"></span>Проценты: <strong>${formatMoney(instInterest)}</strong></div>
+                        ${state.installmentBonus > 0 ? `<div><span class="visual-dot" style="background: #f14635;"></span>Бонус: <strong>${formatMoney(state.installmentBonus)}</strong></div>` : ''}
+                    </div>
                 `;
             } else if (item.id === 'res-gold') {
                 explanation = `
-                    <div style="color: #333333; margin-bottom: 8px;">Бонусы зачисляются сразу, но не растут на депозите.</span>
+                    <div style="color: #333333; margin-bottom: 8px;">Бонусы зачисляются сразу, но не растут на депозите.</div>
                     <div class="visual-bar-container">
-                        <div class="visual-bar-part" style="width: 100%; background: #f14635;"></span>
-                    </span>
+                        <div class="visual-bar-part" style="width: 100%; background: #f14635;"></div>
+                    </div>
                     <div class="visual-legend">
-                        <div><span class="visual-dot" style="background: #f14635;"></span>Kaspi Бонусы: <strong>${formatMoney(state.kaspiGoldBonusAmount)}</strong></span>
-                    </span>
+                        <div><span class="visual-dot" style="background: #f14635;"></span>Kaspi Бонусы: <strong>${formatMoney(state.kaspiGoldBonusAmount)}</strong></div>
+                    </div>
                 `;
             } else if (item.id === 'res-iron') {
                 let ironTot = item.val;
                 let ironCashPct = Math.round((ironCashback / ironTot) * 100);
                 let ironInt = ironTot - ironCashback;
                 explanation = `
-                    <div style="color: #333333; margin-bottom: 8px;">Кешбэк деньгами сразу кладется на депозит.</span>
+                    <div style="color: #333333; margin-bottom: 8px;">Кешбэк деньгами сразу кладется на депозит.</div>
                     <div class="visual-bar-container">
-                        <div class="visual-bar-part" style="width: ${ironCashPct}%; background: #0079C2;"></span>
-                        <div class="visual-bar-part" style="width: ${100 - ironCashPct}%; background: #12a04b;"></span>
-                    </span>
+                        <div class="visual-bar-part" style="width: ${ironCashPct}%; background: #0079C2;"></div>
+                        <div class="visual-bar-part" style="width: ${100 - ironCashPct}%; background: #12a04b;"></div>
+                    </div>
                     <div class="visual-legend">
-                        <div><span class="visual-dot" style="background: #0079C2;"></span>Кешбэк (4%): <strong>${formatMoney(ironCashback)}</strong></span>
-                        <div><span class="visual-dot" style="background: #12a04b;"></span>Проценты: <strong>${formatMoney(ironInt)}</strong></span>
-                    </span>
+                        <div><span class="visual-dot" style="background: #0079C2;"></span>Кешбэк (4%): <strong>${formatMoney(ironCashback)}</strong></div>
+                        <div><span class="visual-dot" style="background: #12a04b;"></span>Проценты: <strong>${formatMoney(ironInt)}</strong></div>
+                    </div>
                 `;
             }
 
